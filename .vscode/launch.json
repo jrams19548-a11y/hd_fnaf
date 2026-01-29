@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Serve index.html (http-server)",
+      "type": "pwa-node",
+      "request": "launch",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "http-server",
+        "${workspaceFolder}",
+        "-p",
+        "8000",
+        "-a",
+        "127.0.0.1",
+        "-c-1"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "serverReadyAction": {
+        "pattern": "Available on",
+        "uriFormat": "http://127.0.0.1:%s",
+        "action": "openExternally"
+      }
+    }
+  ]
+}

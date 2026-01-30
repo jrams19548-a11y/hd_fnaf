@@ -25,312 +25,478 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0;
-            height: 100%;
-        }
+            <!DOCTYPE html>
+            <html lang="en">
 
-        a {
-            text-decoration: none;
-        }
-
-        .selection {
-            height: auto;
-            min-height: 100vh;
-            width: 100%;
-            display: flex;
-            overflow: hidden;
-        }
-
-        .launcher-text {
-            position: absolute;
-            left: 50%;
-            transform: translate(-50%, 0);
-            bottom: 2.5vh;
-            z-index: 1;
-        }
-
-        .vignette {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-        }
-
-        .glitch {
-            position: absolute;
-            background-image: url(resources/background.gif);
-            background-position: center;
-            background-size: 50vw;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            opacity: 0.75;
-            z-index: -1;
-        }
-
-        canvas {
-            display: none;
-            user-select: none;
-        }
-
-        #title {
-            position: absolute;
-            top: 10vh;
-            left: 5vw;
-            z-index: 1;
-            height: 20vh;
-        }
-
-        #animatronic {
-            position: absolute;
-            top: -5vh;
-            right: 7vw;
-            height: 120vh;
-        }
-
-        .loader {
-            position: absolute;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            left: 50%;
-            transform: translate(-50%, 0);
-            bottom: 12vh;
-            z-index: 1;
-            color: white;
-            font-family: monospace;
-            text-align: center;
-            font-weight: lighter;
-            width: 85vw;
-        }
-
-        .loader h1 {
-            margin: 0;
-            font-size: 5vw;
-        }
-
-        .loader hr{
-            margin: 0;
-            border: white solid 0.1vw;
-            width: 0%;
-        }
-
-        .loader h2 {
-            margin: 1vh 0;
-            font-size: 1.4vw;
-        }
-    </style>
-</head>
-
-<body>
-    <canvas id="MMFCanvas" width="1024" height="768"> Your browser does not support Canvas, Please try again.</canvas>
-    <div class="selection" id="selection">
-        <img id="title" src="resources/title.png">
-        <img id="animatronic" src="resources/animatronic.png">
-        <div class="loader">
-            <h1 id="percentage">0%</h1>
-            <hr id="bar">
-            <h2 id="stage">STARTING UP...</h2>
-        </div>
-        <a href="https://discord.gg/xuu8TnSY4b">
-            <div class="launcher-text"><img src="resources/launcher-text.png" style="width: 45vw;"></div>
-        </a>
-    </div>
-    <div class="glitch"></div>
-    <img src="resources/vignette.png" class="vignette">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-</body>
-<!--Made by irv77-->
-<script>
-    const parts = 20;
-    let gametitle, runtimecanvas
-    gametitle = document.title;
-    runtimecanvas = "resources/fnaf 4.cch";
-    // Prevents touchscreen move
-    window.addEventListener("scroll", preventMotion, false);
-    window.addEventListener("touchmove", preventMotion, false);
-    function preventMotion(event) {
-        window.scrollTo(0, 0);
-        event.preventDefault();
-        event.stopPropagation();
-    }
-    // Fullscreen Key
-    const pressedKeys = {};
-    document.addEventListener('keydown', event => {
-        pressedKeys[event.key] = true;
-        if (pressedKeys['-'] && pressedKeys['=']) {
-            document.querySelector('canvas').requestFullscreen();
-            delete pressedKeys[event.key];
-        }
-    });
-    document.addEventListener('keyup', (event) => {
-        delete pressedKeys[event.key];
-    });
-    // -----------------
-    window.onload = function () {
-        const map = new Map();
-
-        function updateProgress(text, percent) {
-            document.title = percent + '% ' + gametitle
-            document.getElementById('percentage').innerHTML = percent + '%';
-            document.getElementById('bar').style.width = percent + '%';
-            document.getElementById('stage').innerHTML = text;
-        }
-
-        async function intercept() {
-            const ogfetch = window.fetch;
-            window.fetch = async function (input, init) {
-                if (typeof input === 'string' && input.startsWith('resources/')) {
-                    const fileName = input.split('/').pop();
-                    if (map.has(fileName)) {
-                        return ogfetch(map.get(fileName), init);
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Five Nights at Freddy's 4</title>
+                <link rel="icon" href="favicon.ico" />
+                <style>
+                    html {
+                        display: block;
+                        -webkit-user-select: none;
+                        -ms-user-select: none;
+                        user-select: none;
+                        overflow: hidden;
+                        height: 100%;
                     }
-                }
-                return ogfetch(input, init);
-            };
 
-            const ogopen = XMLHttpRequest.prototype.open;
-            XMLHttpRequest.prototype.open = function (method, url) {
-                if (url.startsWith('resources/')) {
-                    const fileName = url.split('/').pop();
-                    if (map.has(fileName)) {
-                        url = map.get(fileName);
+                    body {
+                        position: relative;
+                        background-color: black;
+                        background-image: url(resources/office.png);
+                        background-position: center;
+                        background-size: cover;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0;
+                        height: 100%;
                     }
-                }
-                return ogopen.apply(this, arguments);
-            };
 
-            const types = [HTMLImageElement, HTMLAudioElement, HTMLVideoElement];
-            for (const Tag of types) {
-                const descriptor = Object.getOwnPropertyDescriptor(Tag.prototype, 'src');
-                if (descriptor && descriptor.set) {
-                    Object.defineProperty(Tag.prototype, 'src', {
-                        configurable: true,
-                        enumerable: true,
-                        get: descriptor.get,
-                        set: function (val) {
-                            if (typeof val === 'string' && val.startsWith('resources/')) {
-                                const fileName = val.split('/').pop();
+                    a {
+                        text-decoration: none;
+                    }
+
+                    .selection {
+                        height: auto;
+                        min-height: 100vh;
+                        width: 100%;
+                        display: flex;
+                        overflow: hidden;
+                    }
+
+                    .launcher-text {
+                        position: absolute;
+                        left: 50%;
+                        transform: translate(-50%, 0);
+                        bottom: 2.5vh;
+                        z-index: 1;
+                    }
+
+                    .vignette {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100vw;
+                        height: 100vh;
+                        pointer-events: none;
+                    }
+
+                    .glitch {
+                        position: absolute;
+                        background-image: url(resources/background.gif);
+                        background-position: center;
+                        background-size: 50vw;
+                        top: 0;
+                        left: 0;
+                        width: 100vw;
+                        height: 100vh;
+                        pointer-events: none;
+                        opacity: 0.75;
+                        z-index: -1;
+                    }
+
+                    canvas {
+                        display: none;
+                        user-select: none;
+                    }
+
+                    #title {
+                        position: absolute;
+                        top: 10vh;
+                        left: 5vw;
+                        z-index: 1;
+                        height: 20vh;
+                    }
+
+                    #animatronic {
+                        position: absolute;
+                        top: -5vh;
+                        right: 7vw;
+                        height: 120vh;
+                    }
+
+                    .loader {
+                        position: absolute;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        left: 50%;
+                        transform: translate(-50%, 0);
+                        bottom: 12vh;
+                        z-index: 1;
+                        color: white;
+                        font-family: monospace;
+                        text-align: center;
+                        font-weight: lighter;
+                        width: 85vw;
+                    }
+
+                    .loader h1 {
+                        margin: 0;
+                        font-size: 5vw;
+                    }
+
+                    .loader hr{
+                        margin: 0;
+                        border: white solid 0.1vw;
+                        width: 0%;
+                    }
+
+                    .loader h2 {
+                        margin: 1vh 0;
+                        font-size: 1.4vw;
+                    }
+
+                    .tips-container {
+                        position: absolute;
+                        top: 5vh;
+                        left: 50%;
+                        transform: translate(-50%, 0);
+                        max-width: 80vw;
+                        background: rgba(0, 0, 0, 0.85);
+                        border: 2px solid #ff6b6b;
+                        border-radius: 8px;
+                        padding: 2vh;
+                        z-index: 100;
+                        color: #fff;
+                        font-family: monospace;
+                        text-align: center;
+                        opacity: 0;
+                        transition: opacity 0.3s ease;
+                    }
+
+                    .tips-container.show {
+                        opacity: 1;
+                    }
+
+                    .tips-container h3 {
+                        margin: 0 0 1vh 0;
+                        color: #ff6b6b;
+                        font-size: 1.2vw;
+                        text-transform: uppercase;
+                    }
+
+                    .tips-container p {
+                        margin: 0;
+                        font-size: 1vw;
+                        color: #ccc;
+                        line-height: 1.5;
+                    }
+                </style>
+            </head>
+
+            <body>
+                <div class="tips-container" id="tipsContainer">
+                    <h3>💡 PRO TIP</h3>
+                    <p id="tipText"></p>
+                </div>
+                <canvas id="MMFCanvas" width="1024" height="768"> Your browser does not support Canvas, Please try again.</canvas>
+                <div class="selection" id="selection">
+                    <img id="title" src="resources/title.png">
+                    <img id="animatronic" src="resources/animatronic.png">
+                    <div class="loader">
+                        <h1 id="percentage">0%</h1>
+                        <hr id="bar">
+                        <h2 id="stage">STARTING UP...</h2>
+                    </div>
+                    <a href="https://discord.gg/xuu8TnSY4b">
+                        <div class="launcher-text"><img src="resources/launcher-text.png" style="width: 45vw;"></div>
+                    </a>
+                </div>
+                <div class="glitch"></div>
+                <img src="resources/vignette.png" class="vignette">
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+            </body>
+            <!--Made by irv77-->
+            <script>
+                const parts = 20;
+                let gametitle, runtimecanvas
+                gametitle = document.title;
+                runtimecanvas = "resources/fnaf 4.cch";
+
+                // Tips system
+                const tips = [
+                    "LISTEN CAREFULLY - Sound cues are CRITICAL for identifying which animatronic is attacking!",
+                    "Close doors only when necessary - breathing takes power from your door defense!",
+                    "Heavy footsteps mean a dangerous animatronic is approaching - act fast!",
+                    "Use your flashlight ONLY for hallucinations in your room - it won't help against door threats.",
+                    "Each animatronic has unique footstep sounds - learn to identify them instantly!",
+                    "Stay in bed for most of the night - it's your safest position.",
+                    "Power runs out on Night 5 - you need near-perfect defense management!",
+                    "Nightmare Foxy is extremely dangerous on Night 5+ - listen for his distinctive sounds!",
+                    "Never close both doors at once for long - power drains exponentially!",
+                    "Audio cues change as the night progresses - stay alert for variations!",
+                    "Hallucinations appear in your closet - use flashlight to dispel them.",
+                    "The Puppet can appear in your room - be ready with your flashlight!",
+                    "Closing doors costs significant power - only use them as a last resort.",
+                    "Breathing sounds alert you to danger - the silence is your best friend.",
+                    "Golden Freddy attacks are unavoidable - just wait for them to pass.",
+                    "Night 4 is often harder than Night 5 - don't underestimate it!",
+                    "Remember: If an animatronic gets in, you're done - prevention is key!"
+                ];
+
+                let tipsIndex = 0;
+                const tipsContainer = document.getElementById('tipsContainer');
+                const tipText = document.getElementById('tipText');
+                let tipsCycleInterval;
+
+                function showRandomTip() {
+                    tipsIndex = Math.floor(Math.random() * tips.length);
+                    tipText.textContent = tips[tipsIndex];
+                    tipsContainer.classList.add('show');
+                }
+
+                function startTipsCycle() {
+                    showRandomTip();
+                    tipsCycleInterval = setInterval(showRandomTip, 5000);
+                }
+
+                function hideTips() {
+                    clearInterval(tipsCycleInterval);
+                    tipsContainer.classList.remove('show');
+                }
+
+                startTipsCycle();
+
+                // Prevents touchscreen move
+                window.addEventListener("scroll", preventMotion, false);
+                window.addEventListener("touchmove", preventMotion, false);
+                function preventMotion(event) {
+                    window.scrollTo(0, 0);
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                // Fullscreen Key
+                const pressedKeys = {};
+                document.addEventListener('keydown', event => {
+                    pressedKeys[event.key] = true;
+                    if (pressedKeys['-'] && pressedKeys['=']) {
+                        document.querySelector('canvas').requestFullscreen();
+                        delete pressedKeys[event.key];
+                    }
+                });
+                document.addEventListener('keyup', (event) => {
+                    delete pressedKeys[event.key];
+                });
+                // -----------------
+                window.onload = function () {
+                    const map = new Map();
+
+                    function updateProgress(text, percent) {
+                        document.title = percent + '% ' + gametitle
+                        document.getElementById('percentage').innerHTML = percent + '%';
+                        document.getElementById('bar').style.width = percent + '%';
+                        document.getElementById('stage').innerHTML = text;
+                    }
+
+                    async function intercept() {
+                        const ogfetch = window.fetch;
+                        window.fetch = async function (input, init) {
+                            if (typeof input === 'string' && input.startsWith('resources/')) {
+                                const fileName = input.split('/').pop();
                                 if (map.has(fileName)) {
-                                    val = map.get(fileName);
+                                    return ogfetch(map.get(fileName), init);
                                 }
                             }
-                            descriptor.set.call(this, val);
+                            return ogfetch(input, init);
+                        };
+
+                        const ogopen = XMLHttpRequest.prototype.open;
+                        XMLHttpRequest.prototype.open = function (method, url) {
+                            if (url.startsWith('resources/')) {
+                                const fileName = url.split('/').pop();
+                                if (map.has(fileName)) {
+                                    url = map.get(fileName);
+                                }
+                            }
+                            return ogopen.apply(this, arguments);
+                        };
+
+                        const types = [HTMLImageElement, HTMLAudioElement, HTMLVideoElement];
+                        for (const Tag of types) {
+                            const descriptor = Object.getOwnPropertyDescriptor(Tag.prototype, 'src');
+                            if (descriptor && descriptor.set) {
+                                Object.defineProperty(Tag.prototype, 'src', {
+                                    configurable: true,
+                                    enumerable: true,
+                                    get: descriptor.get,
+                                    set: function (val) {
+                                        if (typeof val === 'string' && val.startsWith('resources/')) {
+                                            const fileName = val.split('/').pop();
+                                            if (map.has(fileName)) {
+                                                val = map.get(fileName);
+                                            }
+                                        }
+                                        descriptor.set.call(this, val);
+                                    }
+                                });
+                            }
                         }
-                    });
-                }
-            }
-        }
-
-        async function extract() {
-            const res = await fetch("resources.zip");
-
-            const contentLength = res.headers.get("Content-Length");
-            const total = parseInt(contentLength, 10);
-            const reader = res.body.getReader();
-            let loaded = 0;
-            const chunks = [];
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                chunks.push(value);
-                loaded += value.length;
-                updateProgress('RETURNING GEARS...', Math.floor((loaded / total / 2) * 100));
-            }
-
-            const arrayBuffer = await new Blob(chunks).arrayBuffer();
-            const zip = await JSZip.loadAsync(arrayBuffer);
-            const files = Object.keys(zip.files).filter(name => !zip.files[name].dir);
-            const totalFiles = files.length;
-
-            for (let i = 0; i < totalFiles; i++) {
-                const file = zip.files[files[i]];
-                const blob = await file.async("blob");
-                const url = URL.createObjectURL(blob);
-                map.set(files[i], url);
-                updateProgress('BOOTING UP ARCHIVE...', Math.floor(((i + 1) / totalFiles / 2) * 100 + 50));
-            }
-        }
-
-        async function wedone() {
-            await extract();
-            await intercept();
-
-            const script = document.createElement('script');
-            script.src = 'src/Runtime.js';
-            script.onload = () => {
-                new Runtime("MMFCanvas", runtimecanvas);
-            };
-            document.getElementById('MMFCanvas').style.display = 'block';
-            document.getElementById('selection').style.display = 'none';
-            document.title = gametitle;
-            document.head.appendChild(script);
-        }
-
-        const originalFetch = window.fetch;
-
-        function mergeFiles(fileParts) {
-            return new Promise((resolve, reject) => {
-                let buffers = [];
-                let totalSize = 0;
-                let loadedSize = 0;
-                Promise.all(fileParts.map(part =>
-                    fetch(part, { method: 'HEAD' }).then(res => {
-                        try {
-                            if (!res.ok) throw new Error("Missing part: " + part);
-                            return parseInt(res.headers.get("Content-Length") || "0", 10);
-                        } catch (error) { document.getElementById('stage').innerHTML = "ERROR: MISSING FILE(S)..." }
-                    })
-                )).then(sizes => {
-                    totalSize = sizes.reduce((a, b) => a + b, 0);
-                    function fetchPart(index) {
-                        if (index >= fileParts.length) {
-                            let mergedBlob = new Blob(buffers);
-                            let mergedFileUrl = URL.createObjectURL(mergedBlob);
-                            resolve(mergedFileUrl);
-                            return;
-                        }
-
-                        fetch(fileParts[index]).then((response) => {
-                            if (!response.ok) throw new Error("Missing part: " + fileParts[index]);
-                            return response.arrayBuffer();
-                        }).then((data) => {
-                            buffers.push(data);
-                            loadedSize += data.byteLength;
-                            updateProgress('LOCATING ARCHIVE...', Math.floor((loadedSize / totalSize / 2) * 100));
-                            fetchPart(index + 1);
-                        }).catch(reject);
                     }
 
-                    fetchPart(0);
-                }).catch(reject);
-            });
-        }
+                    async function extract() {
+                        const res = await fetch("resources.zip");
 
-        function getParts(file, start, end) {
-            let parts = [];
-            for (let i = start; i <= end; i++) {
-                parts.push(file + ".part" + i);
-            }
-            return parts;
-        }
-        Promise.all([
-            mergeFiles(getParts("src/resources.zip", 1, parts))
-        ]).then(([resources]) => {
-            window.fetch = async function (url, ...args) {
-                if (url.endsWith("resources.zip")) {
-                    return originalFetch(resources, ...args);
-                } else {
-                    return originalFetch(url, ...args);
-                }
+                        const contentLength = res.headers.get("Content-Length");
+                        const total = parseInt(contentLength, 10);
+                        const reader = res.body.getReader();
+                        let loaded = 0;
+                        const chunks = [];
+
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+                            chunks.push(value);
+                            loaded += value.length;
+                            updateProgress('RETURNING GEARS...', Math.floor((loaded / total / 2) * 100));
+                        }
+
+                        const arrayBuffer = await new Blob(chunks).arrayBuffer();
+                        const zip = await JSZip.loadAsync(arrayBuffer);
+                        const files = Object.keys(zip.files).filter(name => !zip.files[name].dir);
+                        const totalFiles = files.length;
+
+                        for (let i = 0; i < totalFiles; i++) {
+                            const file = zip.files[files[i]];
+                            const blob = await file.async("blob");
+                            const url = URL.createObjectURL(blob);
+                            map.set(files[i], url);
+                            updateProgress('BOOTING UP ARCHIVE...', Math.floor(((i + 1) / totalFiles / 2) * 100 + 50));
+                        }
+                    }
+
+                    async function wedone() {
+                        await extract();
+                        await intercept();
+
+                        hideTips();
+
+                        const script = document.createElement('script');
+                        script.src = 'src/Runtime.js';
+                        script.onload = () => {
+                            new Runtime("MMFCanvas", runtimecanvas);
+                        };
+                        document.getElementById('MMFCanvas').style.display = 'block';
+                        document.getElementById('selection').style.display = 'none';
+                        document.title = gametitle;
+                        document.head.appendChild(script);
+                    }
+
+                    const originalFetch = window.fetch;
+
+                    function mergeFiles(fileParts) {
+                        return new Promise((resolve, reject) => {
+                            let buffers = [];
+                            let totalSize = 0;
+                            let loadedSize = 0;
+                            Promise.all(fileParts.map(part =>
+                                fetch(part, { method: 'HEAD' }).then(res => {
+                                    try {
+                                        if (!res.ok) throw new Error("Missing part: " + part);
+                                        return parseInt(res.headers.get("Content-Length") || "0", 10);
+                                    } catch (error) { document.getElementById('stage').innerHTML = "ERROR: MISSING FILE(S)..." }
+                                })
+                            )).then(sizes => {
+                                totalSize = sizes.reduce((a, b) => a + b, 0);
+                                function fetchPart(index) {
+                                    if (index >= fileParts.length) {
+                                        let mergedBlob = new Blob(buffers);
+                                        let mergedFileUrl = URL.createObjectURL(mergedBlob);
+                                        resolve(mergedFileUrl);
+                                        return;
+                                    }
+
+                                    fetch(fileParts[index]).then((response) => {
+                                        if (!response.ok) throw new Error("Missing part: " + fileParts[index]);
+                                        return response.arrayBuffer();
+                                    }).then((data) => {
+                                        buffers.push(data);
+                                        loadedSize += data.byteLength;
+                                        updateProgress('LOCATING ARCHIVE...', Math.floor((loadedSize / totalSize / 2) * 100));
+                                        fetchPart(index + 1);
+                                    }).catch(reject);
+                                }
+
+                                fetchPart(0);
+                            }).catch(reject);
+                        });
+                    }
+
+                    function getParts(file, start, end) {
+                        let parts = [];
+                        for (let i = start; i <= end; i++) {
+                            parts.push(file + ".part" + i);
+                        }
+                        return parts;
+                    }
+                    Promise.all([
+                        mergeFiles(getParts("src/resources.zip", 1, parts))
+                    ]).then(([resources]) => {
+                        window.fetch = async function (url, ...args) {
+                            if (url.endsWith("resources.zip")) {
+                                return originalFetch(resources, ...args);
+                            } else {
+                                return originalFetch(url, ...args);
+                            }
+                        };
+                        wedone();
+                    });
             };
-            wedone();
-        });
-    };
+    </script>
+
+    <!-- Pause overlay and hold-Esc exit -->
+    <script>
+    (function(){
+        // Create overlay
+        const css = `
+        .pause-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center}
+        .pause-menu{background:linear-gradient(135deg,#1a0a1a,#2d1a2d);padding:30px;border:3px solid #8b0000;color:#fff;max-width:420px;text-align:center;border-radius:6px}
+        .pause-menu h2{color:#ff4444;margin:0 0 8px}
+        .pause-menu p{color:#ccc;margin:0 0 12px}
+        .pause-menu button{background:#ff4444;border:none;color:#fff;padding:8px 12px;cursor:pointer}
+        `;
+        const style = document.createElement('style'); style.textContent = css; document.head.appendChild(style);
+
+        const overlay = document.createElement('div'); overlay.id = 'pauseOverlay'; overlay.className = 'pause-overlay';
+        overlay.innerHTML = `<div class="pause-menu"><h2>Paused</h2><p>Press Esc to resume</p><button id="exitFullscreenBtn">Hold Esc to Exit Fullscreen</button></div>`;
+        document.body.appendChild(overlay);
+
+        let escHoldTimer = null; const ESC_HOLD_MS = 800; let isPaused = false;
+        function showPause(){ isPaused = true; overlay.style.display = 'flex'; }
+        function hidePause(){ isPaused = false; overlay.style.display = 'none'; }
+        function togglePause(){ if(isPaused) hidePause(); else showPause(); }
+
+        document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ if(escHoldTimer == null){ escHoldTimer = setTimeout(()=>{ escHoldTimer = null; // held long enough -> exit fullscreen if possible
+                    if(document.fullscreenElement){ document.exitFullscreen(); }
+                }, ESC_HOLD_MS); } } });
+
+        document.addEventListener('keyup', function(e){ if(e.key === 'Escape'){ if(escHoldTimer){ // released before hold threshold -> treat as tap to toggle pause
+                    clearTimeout(escHoldTimer); escHoldTimer = null; togglePause(); } } });
+
+        // Also close overlay on click
+        overlay.addEventListener('click', function(e){ if(e.target === overlay) hidePause(); });
+        const exitBtn = document.getElementById('exitFullscreenBtn'); if(exitBtn){ exitBtn.addEventListener('click', function(){ if(document.fullscreenElement) document.exitFullscreen(); }); }
+    })();
+    </script>
+
+    </html>
+</script>
+<script>
+(function(){
+    const overlay = document.getElementById('pauseOverlay');
+    if(!overlay) return;
+    const ESC_HOLD_MS = 800; let escHoldTimer = null; let isPaused = false;
+    function showPause(){ isPaused = true; overlay.style.display = 'flex'; window.__paused = true; window.dispatchEvent(new Event('blur')); document.dispatchEvent(new Event('visibilitychange')); }
+    function hidePause(){ isPaused = false; overlay.style.display = 'none'; window.__paused = false; window.dispatchEvent(new Event('focus')); document.dispatchEvent(new Event('visibilitychange')); }
+    function togglePause(){ if(isPaused) hidePause(); else showPause(); }
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ if(document.fullscreenElement){ try{ e.preventDefault(); }catch{} } if(escHoldTimer == null){ escHoldTimer = setTimeout(()=>{ escHoldTimer = null; if(document.fullscreenElement) document.exitFullscreen(); }, ESC_HOLD_MS); } } });
+    document.addEventListener('keyup', function(e){ if(e.key === 'Escape'){ if(escHoldTimer){ clearTimeout(escHoldTimer); escHoldTimer = null; togglePause(); } } });
+    overlay.addEventListener('click', function(e){ if(e.target === overlay) hidePause(); });
+    const exitBtn = document.getElementById('exitFullscreenBtn'); if(exitBtn){ exitBtn.addEventListener('click', function(){ if(document.fullscreenElement) document.exitFullscreen(); }); }
+})();
 </script>
 </html>

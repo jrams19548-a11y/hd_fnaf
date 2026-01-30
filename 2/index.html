@@ -127,10 +127,50 @@
             margin: 1vh 0;
             font-size: 1.4vw;
         }
+
+        .tips-container {
+            position: absolute;
+            top: 5vh;
+            left: 50%;
+            transform: translate(-50%, 0);
+            max-width: 80vw;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #ff6b6b;
+            border-radius: 8px;
+            padding: 2vh;
+            z-index: 100;
+            color: #fff;
+            font-family: monospace;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tips-container.show {
+            opacity: 1;
+        }
+
+        .tips-container h3 {
+            margin: 0 0 1vh 0;
+            color: #ff6b6b;
+            font-size: 1.2vw;
+            text-transform: uppercase;
+        }
+
+        .tips-container p {
+            margin: 0;
+            font-size: 1vw;
+            color: #ccc;
+            line-height: 1.5;
+        }
     </style>
 </head>
 
 <body>
+    <div class="tips-container" id="tipsContainer">
+        <h3>💡 PRO TIP</h3>
+        <p id="tipText"></p>
+    </div>
     <canvas id="MMFCanvas" width="1024" height="768"> Your browser does not support Canvas, Please try again.</canvas>
     <div class="selection" id="selection">
         <img id="title" src="resources/title.png">
@@ -154,6 +194,50 @@
     let gametitle, runtimecanvas
     gametitle = document.title;
     runtimecanvas = "resources/FiveNights2NOHACKS.cch";
+    // Tips system
+    const tips = [
+        "Put on the mask RIGHT AFTER you close the cameras - timing is critical!",
+        "Wind up the Puppet music box regularly or he will escape!",
+        "Balloon Boy in the vents is extremely dangerous - he makes Foxy ultra-aggressive!",
+        "Use the flashlight when animatronics appear in the hallway to temporarily stun them.",
+        "Monitor the prize corner constantly - if you neglect it, The Puppet will get out.",
+        "BB's presence makes Foxy essentially unstoppable - avoid letting him in at all costs!",
+        "Toy Bonnie enters from the left vent - monitor those vents carefully.",
+        "The mask mechanic is ESSENTIAL - practice masking on and off efficiently.",
+        "Check cameras quickly and efficiently - flashlight power management is slightly less critical than masking.",
+        "Withered Foxy will spam-attack if BB gets in - you'll need perfect masking.",
+        "Different animatronics favor different vents - learn their patterns.",
+        "The Puppet has lower activity if you keep winding the music box constantly.",
+        "Toy Chica is less predictable than Toy Bonnie - stay alert in hallways.",
+        "On higher difficulties, animatronics will feint attacks - don't panic!",
+        "Audio cues from vents alert you to incoming threats - listen carefully!",
+        "Manage your mask usage - wearing it too long prevents camera checks.",
+        "The left hallway is more active than the right on most nights.",
+        "Remember: Mask prevents jumpscare but only if on before animatronic reaches you!"
+    ];
+
+    let tipsIndex = 0;
+    const tipsContainer = document.getElementById('tipsContainer');
+    const tipText = document.getElementById('tipText');
+    let tipsCycleInterval;
+
+    function showRandomTip() {
+        tipsIndex = Math.floor(Math.random() * tips.length);
+        tipText.textContent = tips[tipsIndex];
+        tipsContainer.classList.add('show');
+    }
+
+    function startTipsCycle() {
+        showRandomTip();
+        tipsCycleInterval = setInterval(showRandomTip, 5000);
+    }
+
+    function hideTips() {
+        clearInterval(tipsCycleInterval);
+        tipsContainer.classList.remove('show');
+    }
+
+    startTipsCycle();
     // Prevents touchscreen move
     window.addEventListener("scroll", preventMotion, false);
     window.addEventListener("touchmove", preventMotion, false);
@@ -265,6 +349,8 @@
             await extract();
             await intercept();
 
+            hideTips();
+
             const script = document.createElement('script');
             script.src = 'src/Runtime.js';
             script.onload = () => {
@@ -334,7 +420,58 @@
                 }
             };
             wedone();
-        });
-    };
+                });
+        };
 </script>
+
+<!-- Pause overlay and hold-Esc exit -->
+<script>
+(function(){
+    // Create overlay
+    const css = `
+    .pause-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center}
+    .pause-menu{background:linear-gradient(135deg,#1a0a1a,#2d1a2d);padding:30px;border:3px solid #8b0000;color:#fff;max-width:420px;text-align:center;border-radius:6px}
+    .pause-menu h2{color:#ff4444;margin:0 0 8px}
+    .pause-menu p{color:#ccc;margin:0 0 12px}
+    .pause-menu button{background:#ff4444;border:none;color:#fff;padding:8px 12px;cursor:pointer}
+    `;
+    const style = document.createElement('style'); style.textContent = css; document.head.appendChild(style);
+
+    const overlay = document.createElement('div'); overlay.id = 'pauseOverlay'; overlay.className = 'pause-overlay';
+    overlay.innerHTML = `<div class="pause-menu"><h2>Paused</h2><p>Press Esc to resume</p><button id="exitFullscreenBtn">Hold Esc to Exit Fullscreen</button></div>`;
+    document.body.appendChild(overlay);
+
+    let escHoldTimer = null; const ESC_HOLD_MS = 800; let isPaused = false;
+    function showPause(){ isPaused = true; overlay.style.display = 'flex'; window.__paused = true; window.dispatchEvent(new Event('blur')); document.dispatchEvent(new Event('visibilitychange')); }
+    function hidePause(){ isPaused = false; overlay.style.display = 'none'; window.__paused = false; window.dispatchEvent(new Event('focus')); document.dispatchEvent(new Event('visibilitychange')); }
+    function togglePause(){ if(isPaused) hidePause(); else showPause(); }
+
+    document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape'){
+            // prevent immediate native fullscreen-exit when holding Esc
+            if(document.fullscreenElement){ try { e.preventDefault(); } catch (err) {}
+            }
+            if(escHoldTimer == null){
+                escHoldTimer = setTimeout(()=>{
+                    escHoldTimer = null; // held long enough -> exit fullscreen if possible
+                    if(document.fullscreenElement){ document.exitFullscreen(); }
+                }, ESC_HOLD_MS);
+            }
+        }
+    });
+
+    document.addEventListener('keyup', function(e){
+        if(e.key === 'Escape'){
+            if(escHoldTimer){ // released before hold threshold -> treat as tap to toggle pause
+                clearTimeout(escHoldTimer); escHoldTimer = null; togglePause();
+            }
+        }
+    });
+
+    // Also close overlay on click
+    overlay.addEventListener('click', function(e){ if(e.target === overlay) hidePause(); });
+    const exitBtn = document.getElementById('exitFullscreenBtn'); if(exitBtn){ exitBtn.addEventListener('click', function(){ if(document.fullscreenElement) document.exitFullscreen(); }); }
+})();
+</script>
+
 </html>

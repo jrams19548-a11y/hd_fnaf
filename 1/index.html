@@ -123,10 +123,50 @@
             margin: 1vh 0;
             font-size: 1.4vw;
         }
+
+        .tips-container {
+            position: absolute;
+            top: 5vh;
+            left: 50%;
+            transform: translate(-50%, 0);
+            max-width: 80vw;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #ff6b6b;
+            border-radius: 8px;
+            padding: 2vh;
+            z-index: 100;
+            color: #fff;
+            font-family: monospace;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tips-container.show {
+            opacity: 1;
+        }
+
+        .tips-container h3 {
+            margin: 0 0 1vh 0;
+            color: #ff6b6b;
+            font-size: 1.2vw;
+            text-transform: uppercase;
+        }
+
+        .tips-container p {
+            margin: 0;
+            font-size: 1vw;
+            color: #ccc;
+            line-height: 1.5;
+        }
     </style>
 </head>
 
 <body>
+    <div class="tips-container" id="tipsContainer">
+        <h3>💡 PRO TIP</h3>
+        <p id="tipText"></p>
+    </div>
     <canvas id="MMFCanvas" width="1280" height="720"> Your browser does not support Canvas, Please try again.</canvas>
     <div class="selection" id="selection">
         <img id="title" src="resources/title.png">
@@ -150,6 +190,49 @@
     let gametitle, runtimecanvas
     gametitle = document.title;
     runtimecanvas = "resources/FNAF1HTML5.cch";
+
+    // Tips system
+    const tips = [
+        "Manage your power carefully! Check the cameras sparingly to conserve energy.",
+        "Listen to the audio cues - Foxy's loud pound means he's about to attack!",
+        "Keep an eye on the West Hall to track Foxy's status in Pirate Cove.",
+        "Bonnie and Chica usually follow similar paths - learn their movement patterns.",
+        "Close doors preemptively when you detect animatronics in the halls.",
+        "The left door is more dangerous than the right - Bonnie is more active.",
+        "Don't keep doors closed for too long - it drains massive amounts of power!",
+        "If power runs out, you have limited time before Freddy attacks - stay calm!",
+        "Alternate between cameras and door checks for optimal power management.",
+        "Freddy becomes very dangerous in the later hours - be extra vigilant on Night 5+.",
+        "Night 4 is often harder than Night 5 - Don't underestimate it!",
+        "The Pirate Cove camera shows you Foxy's status - check it regularly.",
+        "If you see Foxy running, he's about to attack through the left door!",
+        "Save your power for the final hours when animatronics are most aggressive.",
+        "Hearing footsteps? Close the corresponding door immediately!"
+    ];
+
+    let tipsIndex = 0;
+    const tipsContainer = document.getElementById('tipsContainer');
+    const tipText = document.getElementById('tipText');
+    let tipsCycleInterval;
+
+    function showRandomTip() {
+        tipsIndex = Math.floor(Math.random() * tips.length);
+        tipText.textContent = tips[tipsIndex];
+        tipsContainer.classList.add('show');
+    }
+
+    function startTipsCycle() {
+        showRandomTip();
+        tipsCycleInterval = setInterval(showRandomTip, 5000);
+    }
+
+    function hideTips() {
+        clearInterval(tipsCycleInterval);
+        tipsContainer.classList.remove('show');
+    }
+
+    startTipsCycle();
+
     // Prevents touchscreen move
     window.addEventListener("scroll", preventMotion, false);
     window.addEventListener("touchmove", preventMotion, false);
@@ -261,6 +344,8 @@
             await extract();
             await intercept();
 
+            hideTips();
+
             const script = document.createElement('script');
             script.src = 'src/Runtime.js';
             script.onload = () => {
@@ -330,7 +415,57 @@
                 }
             };
             wedone();
-        });
-    };
+                });
+        };
+</script>
+
+<!-- Pause overlay and hold-Esc exit -->
+<script>
+(function(){
+    // Create overlay
+    const css = `
+    .pause-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center}
+    .pause-menu{background:linear-gradient(135deg,#1a0a1a,#2d1a2d);padding:30px;border:3px solid #8b0000;color:#fff;max-width:420px;text-align:center;border-radius:6px}
+    .pause-menu h2{color:#ff4444;margin:0 0 8px}
+    .pause-menu p{color:#ccc;margin:0 0 12px}
+    .pause-menu button{background:#ff4444;border:none;color:#fff;padding:8px 12px;cursor:pointer}
+    `;
+    const style = document.createElement('style'); style.textContent = css; document.head.appendChild(style);
+
+    const overlay = document.createElement('div'); overlay.id = 'pauseOverlay'; overlay.className = 'pause-overlay';
+    overlay.innerHTML = `<div class="pause-menu"><h2>Paused</h2><p>Press Esc to resume</p><button id="exitFullscreenBtn">Hold Esc to Exit Fullscreen</button></div>`;
+    document.body.appendChild(overlay);
+
+    let escHoldTimer = null; const ESC_HOLD_MS = 800; let isPaused = false;
+    function showPause(){ isPaused = true; overlay.style.display = 'flex'; }
+    function hidePause(){ isPaused = false; overlay.style.display = 'none'; }
+    function togglePause(){ if(isPaused) hidePause(); else showPause(); }
+
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ if(escHoldTimer == null){ escHoldTimer = setTimeout(()=>{ escHoldTimer = null; // held long enough -> exit fullscreen if possible
+                if(document.fullscreenElement){ document.exitFullscreen(); }
+            }, ESC_HOLD_MS); } } });
+
+    document.addEventListener('keyup', function(e){ if(e.key === 'Escape'){ if(escHoldTimer){ // released before hold threshold -> treat as tap to toggle pause
+                clearTimeout(escHoldTimer); escHoldTimer = null; togglePause(); } } });
+
+    // Also close overlay on click
+    overlay.addEventListener('click', function(e){ if(e.target === overlay) hidePause(); });
+    const exitBtn = document.getElementById('exitFullscreenBtn'); if(exitBtn){ exitBtn.addEventListener('click', function(){ if(document.fullscreenElement) document.exitFullscreen(); }); }
+})();
+</script>
+
+<script>
+(function(){
+    const overlay = document.getElementById('pauseOverlay');
+    if(!overlay) return;
+    const ESC_HOLD_MS = 800; let escHoldTimer = null; let isPaused = false;
+    function showPause(){ isPaused = true; overlay.style.display = 'flex'; window.__paused = true; window.dispatchEvent(new Event('blur')); document.dispatchEvent(new Event('visibilitychange')); }
+    function hidePause(){ isPaused = false; overlay.style.display = 'none'; window.__paused = false; window.dispatchEvent(new Event('focus')); document.dispatchEvent(new Event('visibilitychange')); }
+    function togglePause(){ if(isPaused) hidePause(); else showPause(); }
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ if(document.fullscreenElement){ try{ e.preventDefault(); }catch{} } if(escHoldTimer == null){ escHoldTimer = setTimeout(()=>{ escHoldTimer = null; if(document.fullscreenElement) document.exitFullscreen(); }, ESC_HOLD_MS); } } });
+    document.addEventListener('keyup', function(e){ if(e.key === 'Escape'){ if(escHoldTimer){ clearTimeout(escHoldTimer); escHoldTimer = null; togglePause(); } } });
+    overlay.addEventListener('click', function(e){ if(e.target === overlay) hidePause(); });
+    const exitBtn = document.getElementById('exitFullscreenBtn'); if(exitBtn){ exitBtn.addEventListener('click', function(){ if(document.fullscreenElement) document.exitFullscreen(); }); }
+})();
 </script>
 </html>

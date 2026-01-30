@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Five Nights at Freddy's - Game Launcher</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Fredoka:wght@400;700&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -12,150 +14,775 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 50%, #0f0f1f 100%);
+            background-attachment: fixed;
+            font-family: 'Fredoka', sans-serif;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            display: block;
+            padding: 20px 20px 80px 20px;
+            position: relative;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(75, 0, 130, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 50px;
+            position: relative;
         }
 
         h1 {
             text-align: center;
-            color: #fff;
-            margin-bottom: 40px;
-            font-size: 2.5em;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            color: #ff4444;
+            font-size: 3em;
+            font-family: 'Creepster', cursive;
+            text-shadow: 
+                0 0 10px rgba(255, 68, 68, 0.8),
+                0 0 20px rgba(139, 0, 0, 0.6),
+                0 2px 10px rgba(0, 0, 0, 0.9);
+            letter-spacing: 2px;
+            animation: flicker 3s infinite;
+            margin: 0;
+        }
+
+        #freddy-image {
+            height: 200px;
+            width: auto;
+            filter: drop-shadow(0 0 20px rgba(255, 68, 68, 0.5));
+            animation: boopFloat 2s ease-in-out infinite;
+            position: relative;
+        }
+
+        #freddy-nose {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            background: radial-gradient(circle at 30% 30%, #ffaa00, #ff6600);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px rgba(255, 102, 0, 0.8);
+            transition: all 0.2s ease;
+        }
+
+        #freddy-nose:hover {
+            transform: translate(-50%, -50%) scale(1.15);
+            box-shadow: 0 0 25px rgba(255, 102, 0, 1);
+        }
+
+        #freddy-nose:active {
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+
+        @keyframes boopFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                text-shadow: 
+                    0 0 10px rgba(255, 68, 68, 0.8),
+                    0 0 20px rgba(139, 0, 0, 0.6),
+                    0 2px 10px rgba(0, 0, 0, 0.9);
+            }
+            20%, 24%, 55% {
+                text-shadow: 
+                    0 0 5px rgba(255, 68, 68, 0.4),
+                    0 0 10px rgba(139, 0, 0, 0.3),
+                    0 2px 5px rgba(0, 0, 0, 0.5);
+            }
         }
 
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            perspective: 1000px;
         }
 
         .game-card {
-            background: linear-gradient(135deg, #333 0%, #444 100%);
-            border: 2px solid #555;
-            border-radius: 8px;
+            border: 3px solid #8b0000;
+            border-radius: 0;
             overflow: hidden;
             text-decoration: none;
             color: #fff;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 150px;
-            padding: 20px;
+            min-height: 180px;
+            padding: 25px;
             text-align: center;
+            position: relative;
+            box-shadow: 
+                0 0 20px rgba(139, 0, 0, 0.3),
+                inset 0 0 20px rgba(75, 0, 130, 0.1);
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a0a1a 0%, #2d1a2d 100%);
+            opacity: 1;
+            transition: opacity 0.4s ease;
+            z-index: 1;
+        }
+
+        .game-card:hover::before {
+            opacity: 0.3;
         }
 
         .game-card:hover {
-            background: linear-gradient(135deg, #444 0%, #555 100%);
-            border-color: #ff6b6b;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+            background: linear-gradient(135deg, #2d1a2d 0%, #3d2a3d 100%);
+            border-color: #ff4444;
+            transform: translateY(-8px) rotateX(5deg);
+            box-shadow: 
+                0 15px 40px rgba(255, 68, 68, 0.5),
+                inset 0 0 20px rgba(139, 0, 0, 0.2);
+        }
+
+        .game-card:hover::before {
+            opacity: 0.3;
         }
 
         .game-card h2 {
-            font-size: 1.5em;
-            margin-bottom: 10px;
+            font-size: 1.6em;
+            margin-bottom: 8px;
+            color: #ff6b6b;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 3;
         }
 
         .game-card p {
             font-size: 0.9em;
-            color: #ccc;
-            margin-bottom: 10px;
+            color: #bbb;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            position: relative;
+            z-index: 3;
         }
 
         .game-card .button {
-            background-color: #ff6b6b;
-            padding: 8px 16px;
-            border-radius: 4px;
+            background: linear-gradient(135deg, #8b0000 0%, #ff4444 100%);
+            padding: 10px 20px;
+            border-radius: 0;
+            border: 2px solid #ff4444;
             color: white;
             font-weight: bold;
-            transition: background-color 0.3s;
+            font-family: 'Fredoka', sans-serif;
+            transition: all 0.3s ease;
             margin-top: 10px;
+            text-transform: uppercase;
+            cursor: pointer;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .game-card .button:not(.strategies-btn) {
+            margin-right: 5px;
+        }
+
+        .button.strategies-btn {
+            background: linear-gradient(135deg, #4b0082 0%, #8b5cf6 100%);
+            border-color: #8b5cf6;
+            padding: 10px 16px;
+            font-size: 0.9em;
+        }
+
+        .button.strategies-btn:hover {
+            background: linear-gradient(135deg, #5b1099 0%, #a78bfa 100%);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
         }
 
         .game-card:hover .button {
-            background-color: #ff5252;
+            background: linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%);
+            box-shadow: 0 0 15px rgba(255, 68, 68, 0.6);
+            transform: scale(1.05);
         }
 
         .directory-label {
-            font-size: 0.8em;
-            color: #999;
-            margin-top: 10px;
+            font-size: 0.75em;
+            color: #777;
+            margin-top: 12px;
+            font-style: italic;
+            position: relative;
+            z-index: 3;
+        }
+
+        /* Animatronic eye glow effect */
+        .game-card::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle at 30% 30%, #ffaa00, #ff6600);
+            border-radius: 50%;
+            opacity: 0.6;
+            box-shadow: 0 0 8px rgba(255, 102, 0, 0.8);
+            animation: eyeFlicker 2s infinite;
+        }
+
+        @keyframes eyeFlicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                opacity: 0.6;
+            }
+            20%, 24%, 55% {
+                opacity: 0.2;
+            }
+        }
+
+        .game-card:hover::after {
+            opacity: 1;
+            box-shadow: 0 0 15px rgba(255, 102, 0, 1);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a0a1a 0%, #2d1a2d 100%);
+            margin: 5% auto;
+            padding: 30px;
+            border: 3px solid #8b0000;
+            border-radius: 0;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #fff;
+            box-shadow: 0 0 30px rgba(255, 68, 68, 0.5);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            color: #ff6b6b;
+            float: right;
+            font-size: 2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: #ff4444;
+        }
+
+        .modal-title {
+            color: #ff4444;
+            font-size: 1.8em;
+            font-family: 'Creepster', cursive;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 68, 68, 0.6);
+        }
+
+        .strategy-section {
+            margin-bottom: 25px;
+        }
+
+        .strategy-section h3 {
+            color: #8b5cf6;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .strategy-section p, .strategy-section ul {
+            color: #ccc;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .strategy-section ul {
+            margin-left: 20px;
+        }
+
+        .strategy-section li {
+            margin-bottom: 8px;
+        }
+
+        .animatronic {
+            background: rgba(75, 0, 130, 0.2);
+            border-left: 3px solid #8b5cf6;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            border-radius: 3px;
+        }
+
+        .animatronic-name {
+            color: #a78bfa;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .animatronic-pattern {
+            color: #bbb;
+            font-size: 0.9em;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+                margin-bottom: 30px;
+            }
+
+            .games-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+            }
+
+            .game-card {
+                min-height: 150px;
+                padding: 15px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎮 Five Nights at Freddy's Collection</h1>
+        <div class="title-section">
+            <h1>🎮 Five Nights at Freddy's Collection</h1>
+            <div style="position: relative; display: inline-block;">
+                <img id="freddy-image" src="freddy.png" alt="Freddy Fazbear">
+                <div id="freddy-nose"></div>
+            </div>
+        </div>
         <div class="games-grid">
-            <a href="1/index.html" class="game-card">
+            <a href="1/index.html" class="game-card" data-bg="1/resources/office.png">
                 <h2>FNAF 1</h2>
                 <p>Five Nights at Freddy's</p>
                 <div class="button">Play</div>
+                <button class="button strategies-btn" onclick="openStrategies(event, 'fnaf1')">Strategies</button>
                 <div class="directory-label">Directory: 1/</div>
             </a>
 
-            <a href="2/index.html" class="game-card">
+            <a href="2/index.html" class="game-card" data-bg="2/resources/office.png">
                 <h2>FNAF 2</h2>
                 <p>Five Nights at Freddy's 2</p>
                 <div class="button">Play</div>
+                <button class="button strategies-btn" onclick="openStrategies(event, 'fnaf2')">Strategies</button>
                 <div class="directory-label">Directory: 2/</div>
             </a>
 
-            <a href="3/index.html" class="game-card">
+            <a href="3/index.html" class="game-card" data-bg="3/resources/office.png">
                 <h2>FNAF 3</h2>
                 <p>Five Nights at Freddy's 3</p>
                 <div class="button">Play</div>
+                <button class="button strategies-btn" onclick="openStrategies(event, 'fnaf3')">Strategies</button>
                 <div class="directory-label">Directory: 3/</div>
             </a>
 
-            <a href="4/index.html" class="game-card">
+            <a href="4/index.html" class="game-card" data-bg="4/resources/office.png">
                 <h2>FNAF 4</h2>
                 <p>Five Nights at Freddy's 4</p>
                 <div class="button">Play</div>
+                <button class="button strategies-btn" onclick="openStrategies(event, 'fnaf4')">Strategies</button>
                 <div class="directory-label">Directory: 4/</div>
             </a>
 
-            <a href="ps/index.html" class="game-card">
+            <a href="ps/index.html" class="game-card" data-bg="ps/resources/office.png">
                 <h2>FNAF PS</h2>
-                <p>Five Nights at Freddy's: PS</p>
+                <p>Five Nights at Freddy's: Pizzeria Simulator</p>
                 <div class="button">Play</div>
+                <button class="button strategies-btn" onclick="openStrategies(event, 'fnafps')">Strategies</button>
                 <div class="directory-label">Directory: ps/</div>
             </a>
 
-            <a href="sl/index.html" class="game-card">
+            <a href="sl/index.html" class="game-card" data-bg="sl/resources/office.png">
                 <h2>FNAF SL</h2>
                 <p>Five Nights at Freddy's: Sister Location</p>
                 <div class="button">Play</div>
+                <button class="button strategies-btn" onclick="openStrategies(event, 'fnafsl')">Strategies</button>
                 <div class="directory-label">Directory: sl/</div>
             </a>
 
-            <a href="ucn/index.html" class="game-card">
+            <a href="ucn/index.html" class="game-card" data-bg="ucn/resources/office.png">
                 <h2>FNAF UCN</h2>
                 <p>Ultimate Custom Night</p>
                 <div class="button">Play</div>
+                <button class="button strategies-btn" onclick="openStrategies(event, 'fnafucn')">Strategies</button>
                 <div class="directory-label">Directory: ucn/</div>
             </a>
 
-            <a href="w/index.html" class="game-card">
+            <a href="w/index.html" class="game-card" data-bg="w/resources/office.png">
                 <h2>FNAF W</h2>
                 <p>Five Nights at Freddy's: W</p>
                 <div class="button">Play</div>
+                <button class="button strategies-btn" onclick="openStrategies(event, 'fnafw')">Strategies</button>
                 <div class="directory-label">Directory: w/</div>
             </a>
         </div>
     </div>
+
+    <!-- Strategy Modals -->
+    <div id="strategiesModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeStrategies()">&times;</span>
+            <div id="strategiesContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const defaultBg = "linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 50%, #0f0f1f 100%)";
+        const gameCards = document.querySelectorAll('.game-card');
+
+        // Preload all background images
+        gameCards.forEach(card => {
+            const bgImage = card.getAttribute('data-bg');
+            const img = new Image();
+            img.src = bgImage;
+        });
+
+        gameCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                const bgImage = this.getAttribute('data-bg');
+                document.body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('${bgImage}')`;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundRepeat = 'no-repeat';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                document.body.style.backgroundImage = defaultBg;
+                document.body.style.backgroundSize = 'auto';
+            });
+        });
+
+        const strategies = {
+            fnaf1: {
+                title: 'FNAF 1 - Pro Strategies',
+                content: `
+                    <div class="strategy-section">
+                        <h3>General Tips</h3>
+                        <ul>
+                            <li><strong>Power Management:</strong> Use cameras sparingly - each camera use drains power. Switch off cameras when not needed.</li>
+                            <li><strong>Door Strategy:</strong> Keep track of animatronics and close doors preemptively to conserve power.</li>
+                            <li><strong>Audio Cues:</strong> Listen for sounds that indicate animatronic movement patterns.</li>
+                            <li><strong>Safe Zones:</strong> Monitor the West Hall to detect Foxy's status.</li>
+                        </ul>
+                    </div>
+
+                    <div class="strategy-section">
+                        <h3>Animatronic Patterns</h3>
+                        <div class="animatronic">
+                            <div class="animatronic-name">🤖 Freddy Fazbear</div>
+                            <div class="animatronic-pattern">Moves slowly and methodically. Becomes aggressive in later nights. Watch the Central Stage camera.</div>
+                        </div>
+                        <div class="animatronic">
+                            <div class="animatronic-name">🎸 Bonnie the Bunny</div>
+                            <div class="animatronic-pattern">Most active animatronic. Moves frequently through West Hall and can enter from the left door.</div>
+                        </div>
+                        <div class="animatronic">
+                            <div class="animatronic-name">🍕 Chica the Chicken</div>
+                            <div class="animatronic-pattern">Moves through East Hall and Right Door. Often follows Bonnie's movement patterns.</div>
+                        </div>
+                        <div class="animatronic">
+                            <div class="animatronic-name">🏴‍☠️ Foxy the Pirate</div>
+                            <div class="animatronic-pattern">Stays in Pirate Cove. Becomes more active as he's banged on more. Check his status frequently.</div>
+                        </div>
+                    </div>
+                `
+            },
+            fnaf2: {
+                title: 'FNAF 2 - Pro Strategies',
+                content: `
+                    <div class="strategy-section">
+                        <h3>General Tips</h3>
+                        <ul>
+                            <li><strong>Flashlight Usage:</strong> Use flashlight strategically when animatronics appear in hallways.</li>
+                            <li><strong>Air Vents:</strong> Monitor vents for Balloon Boy and other threats.</li>
+                            <li><strong>BB Warning:</strong> If BB gets in, Foxy becomes extremely aggressive.</li>
+                            <li><strong>Puppet Box:</strong> Wind up the Puppet music box regularly to prevent escape.</li>
+                        </ul>
+                    </div>
+
+                    <div class="strategy-section">
+                        <h3>Animatronic Patterns</h3>
+                        <div class="animatronic">
+                            <div class="animatronic-name">🤖 Toy Freddy</div>
+                            <div class="animatronic-pattern">Moves through Game Area. Medium threat level. Use cameras to track his position.</div>
+                        </div>
+                        <div class="animatronic">
+                            <div class="animatronic-name">🎸 Toy Bonnie</div>
+                            <div class="animatronic-pattern">Enters from left vent. Second stage entrance. Appears in hallway frequently.</div>
+                        </div>
+                        <div class="animatronic">
+                            <div class="animatronic-name">🍕 Toy Chica</div>
+                            <div class="animatronic-pattern">Right vent threat. Moves through hallways. High activity on later nights.</div>
+                        </div>
+                        <div class="animatronic">
+                            <div class="animatronic-name">🎈 Balloon Boy (BB)</div>
+                            <div class="animatronic-pattern">Enters through left vent. Critical threat - his presence makes Foxy ultra-aggressive.</div>
+                        </div>
+                        <div class="animatronic">
+                            <div class="animatronic-name">🎪 The Puppet</div>
+                            <div class="animatronic-pattern">Monitor prize corner. Wind music box constantly to keep contained. Escapes if neglected.</div>
+                        </div>
+                        <div class="animatronic">
+                            <div class="animatronic-name">🏴‍☠️ Withered Foxy</div>
+                            <div class="animatronic-pattern">Becomes extremely dangerous if BB enters. Will attack frequently if not managed.</div>
+                        </div>
+                    </div>
+                `
+            },
+            fnaf3: {
+                title: 'FNAF 3 - Pro Strategies',
+                content: `
+                    <div class="strategy-section">
+                        <h3>General Tips</h3>
+                        <ul>
+                            <li><strong>Ventilation System:</strong> Control air vents to direct Springtrap away from your location.</li>
+                            <li><strong>Audio Decoys:</strong> Use sound effects to distract Springtrap to other areas.</li>
+                            <li><strong>Camera Blind Spots:</strong> Don't stay on one camera too long - Springtrap learns patterns.</li>
+                            <li><strong>Maintenance Panel:</strong> Repair systems quickly to avoid game overs.</li>
+                        </ul>
+                    </div>
+
+                    <div class="strategy-section">
+                        <h3>Animatronic Patterns</h3>
+                        <div class="animatronic">
+                            <div class="animatronic-name">🔧 Springtrap</div>
+                            <div class="animatronic-pattern">The main threat. Moves through vents and hallways. Use ventilation to direct him away. Actively hunts throughout the night.</div>
+                        </div>
+                        <div class="animatronic">
+                            <div class="animatronic-name">👻 Phantom Animatronics</div>
+                            <div class="animatronic-pattern">Hallucinations that appear on cameras. Looking at them triggers jumpscare effects but no actual threat.</div>
+                        </div>
+                    </div>
+                `
+            },
+            fnaf4: {
+                title: 'FNAF 4 - Pro Strategies',
+                content: `
+                    <div class="strategy-section">
+                        <h3>General Tips</h3>
+                        <ul>
+                            <li><strong>Listen Carefully:</strong> Sound cues are CRITICAL - animatronics approach from specific directions.</li>
+                            <li><strong>Breathing Control:</strong> Close doors only when absolutely necessary - Otherwise if they were'nt there, they will kill you regardless.</li>
+                            <li><strong>Door Direction:</strong> Always know which animatronic is at which door based on footstep sounds.</li>
+                            <li><strong>Bed Strategy:</strong> Stay in bed, use flashlight only for freddles, and if you think no one is at the door, never keep doors closed too long.</li>
+                        </ul>
+                    </div>
+
+                    <div class="strategy-section">
+                        <h3>Animatronic Patterns</h3>
+                        <div class="animatronic">
+                            <div class="animatronic-name">😈 Nightmare Freddy</div>
+                            <div class="animatronic-pattern">Attacks from left side. Listen for heavy footsteps. Close left door when approaching.</div>
+                        </div>
+                        <div class="animatronic">
+                            <div class="animatronic-name">😈 Nightmare Bonnie</div>
+                            <div class="animatronic-pattern">Left side threat. Listen for distinct footsteps. Quick movements between doors.</div>
+                        </div>
+                        <div class="animatronic">
+                            <div class="animatronic-name">😈 Nightmare Chica</div>
+                            <div class="animatronic-pattern">Right side attacker. Identifiable by unique sounds. Patient but steady approach.</div>
+                        </div>
+                        <div class="animatronic">
+                            <div class="animatronic-name">😈 Nightmare Foxy</div>
+                            <div class="animatronic-pattern"> Can come from both hallways, once they enter your room, they will be in the closet.. Most aggressive late-game. Very dangerous on Night 5+.</div>
+                        </div>
+                    </div>
+                `
+            },
+            fnafps: {
+                title: 'FNAF: Pizzeria Simulator - Pro Strategies',
+                content: `
+                    <div class="strategy-section">
+                        <h3>General Tips</h3>
+                        <ul>
+                            <li><strong>Business Management:</strong> Balance multiple systems - you must survive nights while managing a pizzeria.</li>
+                            <li><strong>Resource Collection:</strong> Gather items and parts during the day to prepare for night threats.</li>
+                            <li><strong>Defense Systems:</strong> Build and activate security measures like motion detectors and cameras.</li>
+                            <li><strong>Mini-Games:</strong> Manage various operational tasks during day phases to generate income and resources.</li>
+                            <li><strong>Night Survival:</strong> Endure animatronic attacks while defending against multiple threats simultaneously.</li>
+                        </ul>
+                    </div>
+
+                    <div class="strategy-section">
+                        <h3>Key Strategies</h3>
+                        <ul>
+                            <li>Prioritize building essential security systems before tackling harder nights.</li>
+                            <li>Complete day tasks efficiently to maximize resources for night defense.</li>
+                            <li>Monitor multiple threat indicators simultaneously during night phases.</li>
+                            <li>Allocate power and resources wisely between different defense systems.</li>
+                            <li>Learn animatronic patterns and plan defenses accordingly.</li>
+                        </ul>
+                    </div>
+
+                    <div class="strategy-section">
+                        <h3>Animatronic Threats</h3>
+                        <p>Pizzeria Simulator features threats that behave differently than traditional FNAF games. Focus on understanding the unique mechanics of this game's attack patterns and plan your defense systems to counter specific threats.</p>
+                    </div>
+                `
+            },
+            fnafsl: {
+                title: 'FNAF: Sister Location - Pro Strategies',
+                content: `
+                    <div class="strategy-section">
+                        <h3>General Tips</h3>
+                        <ul>
+                            <li><strong>Animatronic Hacking:</strong> Hack animatronics to temporarily disable threats.</li>
+                            <li><strong>Controlled Shock:</strong> Use electrocution to damage attacking animatronics.</li>
+                            <li><strong>Silent Movement:</strong> Minimize noise and movement to avoid detection.</li>
+                            <li><strong>Power Priorities:</strong> Balance hacking, power, and defense systems carefully.</li>
+                        </ul>
+                    </div>
+
+                    <div class="strategy-section">
+                        <h3>Animatronic Patterns</h3>
+                        <div class="animatronic">
+                            <div class="animatronic-name">🎀 Circus Baby</div>
+                            <div class="animatronic-pattern">Main attraction. Moves through facility. Can be hacked and shocked. Most intelligent animatronic.</div>
+                        </div>
+                        <div class="animatronic">
+                            <div class="animatronic-name">🩰 Ballora</div>
+                            <div class="animatronic-pattern">Moves through rooms gracefully. Avoid detection. Can be temporarily disabled through hacking.</div>
+                        </div>
+                        <div class="animatronic">
+                            <div class="animatronic-name">🤡 Ennard</div>
+                            <div class="animatronic-pattern">Dangerous late-night threat. Requires strategic hacking and shocking to survive.</div>
+                        </div>
+                    </div>
+                `
+            },
+            fnafucn: {
+                title: 'FNAF: Ultimate Custom Night - Pro Strategies',
+                content: `
+                    <div class="strategy-section">
+                        <h3>General Tips</h3>
+                        <ul>
+                            <li><strong>Customizable Difficulty:</strong> Start with easier animatronics, gradually increase challenge.</li>
+                            <li><strong>Selective Threats:</strong> Choose which animatronics to enable for practice.</li>
+                            <li><strong>Combo Strategies:</strong> Learn how different animatronics interact when grouped together.</li>
+                            <li><strong>Master Mechanics:</strong> Each animatronic has unique behavior - learn them all.</li>
+                        </ul>
+                    </div>
+
+                    <div class="strategy-section">
+                        <h3>Key Strategy</h3>
+                        <p>UCN is the ultimate challenge combining all FNAF mechanics. Gradually build your skills by adding animatronics one at a time. Master individual patterns before facing combinations.</p>
+                    </div>
+                `
+            },
+            fnafw: {
+                title: 'FNAF: The Twist - Pro Strategies',
+                content: `
+                    <div class="strategy-section">
+                        <h3>General Tips</h3>
+                        <ul>
+                            <li><strong>New Mechanics:</strong> Introduces unique gameplay elements different from previous games.</li>
+                            <li><strong>Strategic Adaptation:</strong> Traditional strategies may need adjustment.</li>
+                            <li><strong>Experimentation:</strong> Test different approaches to discover effective tactics.</li>
+                            <li><strong>Learning Curve:</strong> Be patient as you learn the new mechanics and animatronic behaviors.</li>
+                        </ul>
+                    </div>
+
+                    <div class="strategy-section">
+                        <h3>Key Strategy</h3>
+                        <p>This entry brings new challenges and mechanics. Focus on understanding the core gameplay loop before optimizing your approach. Pay close attention to tutorial prompts and learn from each night.</p>
+                    </div>
+                `
+            }
+        };
+
+        function openStrategies(event, game) {
+            event.preventDefault();
+            event.stopPropagation();
+            const modal = document.getElementById('strategiesModal');
+            const content = document.getElementById('strategiesContent');
+            
+            if (strategies[game]) {
+                content.innerHTML = `<h2 class="modal-title">${strategies[game].title}</h2>${strategies[game].content}`;
+                modal.style.display = 'block';
+            }
+        }
+
+        function closeStrategies() {
+            document.getElementById('strategiesModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside content
+        window.onclick = function(event) {
+            const modal = document.getElementById('strategiesModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Freddy's Nose Easter Egg
+        const freddyNose = document.getElementById('freddy-nose');
+        const noseBoopSound = new Audio('freddy-nose-boop.mp3');
+
+        freddyNose.addEventListener('click', function(e) {
+            e.stopPropagation();
+            noseBoopSound.currentTime = 0;
+            noseBoopSound.play();
+            
+            // Add a little animation on click
+            freddyNose.style.animation = 'none';
+            setTimeout(() => {
+                freddyNose.style.animation = 'boopFloat 2s ease-in-out infinite';
+            }, 50);
+        });
+    </script>
 </body>
 </html>

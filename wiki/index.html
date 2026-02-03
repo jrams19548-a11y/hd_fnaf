@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FNaF Fan Wiki — Animatronics</title>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #121824;
+      --accent: #e67e22; /* amber/orange */
+      --accent2: #8e44ad; /* purple */
+      --text: #e8ecf1;
+      --muted: #aab3c0;
+      --danger: #e74c3c;
+      --ok: #2ecc71;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; }
+    a { color: var(--accent); }
+
+    header {
+      position: sticky; top: 0; z-index: 50;
+      background: linear-gradient(180deg, rgba(18,24,36,0.95), rgba(18,24,36,0.85));
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid #1e2534;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+    .title { display: flex; align-items: center; gap: 12px; }
+    .title h1 { margin: 0; font-size: 1.6rem; }
+    .badge { background: #1e2534; color: var(--muted); padding: 4px 8px; border-radius: 999px; font-size: 0.85rem; }
+
+    .controls { display: grid; grid-template-columns: 1fr 220px 220px; gap: 12px; margin-top: 12px; }
+    input[type="search"], select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #273045; background: #0f141d; color: var(--text); }
+    input::placeholder { color: #6b7485; }
+
+    main { padding: 18px 16px 48px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+    .card { background: var(--panel); border: 1px solid #1e2534; border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.15s ease, border-color 0.2s ease; }
+    .card:hover { transform: translateY(-2px); border-color: #2a3349; }
+    .thumb { aspect-ratio: 4 / 3; background: #0f141d; display: grid; place-items: center; }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .card .meta { padding: 10px 12px 12px; }
+    .card .name { font-weight: 700; margin-bottom: 4px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { font-size: 0.75rem; padding: 2px 8px; border: 1px solid #273045; border-radius: 999px; color: #b9c2d3; }
+
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.68); display: none; align-items: center; justify-content: center; z-index: 100; }
+    .modal { width: min(920px, 92vw); background: var(--panel); border: 1px solid #2a3349; border-radius: 14px; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.45); }
+    .modal header { background: linear-gradient(180deg, #151c2b, #121824); border-bottom: 1px solid #2a3349; position: static; }
+    .modal .head { display: flex; align-items: center; justify-content: space-between; }
+    .modal .head h2 { margin: 0; font-size: 1.4rem; }
+    .modal .close { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #2a3349; background: #101624; color: var(--muted); padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+    .modal .close:hover { color: var(--text); border-color: #3a4564; }
+    .modal .body { display: grid; grid-template-columns: 1fr 1.1fr; gap: 18px; padding: 16px; }
+    .modal .imgWrap { background: #0f141d; border: 1px solid #1e2534; border-radius: 12px; overflow: hidden; }
+    .modal .imgWrap img { width: 100%; height: auto; display: block; }
+    .modal .section { margin-bottom: 14px; }
+    .modal h3 { margin: 0 0 8px; font-size: 1.05rem; color: var(--accent); }
+    .pill { display: inline-block; padding: 4px 8px; border-radius: 999px; border: 1px solid #273045; margin: 0 6px 6px 0; font-size: 0.85rem; color: #b9c2d3; }
+    ul { margin: 6px 0 0; padding-left: 18px; }
+
+    footer { border-top: 1px solid #1e2534; color: var(--muted); padding: 16px; text-align: center; }
+
+    /* Mobile tweaks */
+    @media (max-width: 720px) {
+      .controls { grid-template-columns: 1fr; }
+      .modal .body { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="title">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" fill="currentColor" />
+        </svg>
+        <h1>FNaF Fan Wiki — Animatronics</h1>
+        <span id="countBadge" class="badge" title="Visible animatronics">0 shown</span>
+      </div>
+      <div class="controls" role="search">
+        <input id="q" type="search" placeholder="Search name, game, book, tag (e.g., 'Security Breach', 'Toy', 'Twisted')" aria-label="Search" />
+        <select id="series" aria-label="Filter by series">
+          <option value="">All series</option>
+          <option>FNaF 1</option>
+          <option>FNaF 2</option>
+          <option>FNaF 3</option>
+          <option>FNaF 4</option>
+          <option>Sister Location</option>
+          <option>Pizzeria Simulator</option>
+          <option>Ultimate Custom Night</option>
+          <option>Help Wanted (VR)</option>
+          <option>Security Breach</option>
+          <option>RUIN (DLC)</option>
+          <option>Books — Original Trilogy</option>
+          <option>Books — Fazbear Frights</option>
+          <option>Books — Tales from the Pizzaplex</option>
+        </select>
+        <select id="sort" aria-label="Sort">
+          <option value="name">Sort: Name (A–Z)</option>
+          <option value="game">Sort: First appearance</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="grid" class="grid" aria-live="polite"></div>
+  </main>
+
+  <div id="backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document">
+      <header>
+        <div class="container head">
+          <h2 id="modalName">Animatronic</h2>
+          <button class="close" id="closeBtn" aria-label="Close dialog">✕ Close</button>
+        </div>
+      </header>
+      <div class="body">
+        <div class="imgWrap"><img id="modalImg" src="" alt="" /></div>
+        <div>
+          <div class="section" id="appearancesSection">
+            <h3>Appearances</h3>
+            <div id="appearancePills"></div>
+          </div>
+          <div class="section">
+            <h3>Behavior</h3>
+            <p id="modalBehavior"></p>
+          </div>
+          <div class="section">
+            <h3>Strategies</h3>
+            <ul id="modalStrategies"></ul>
+          </div>
+          <div class="section" id="tagsSection">
+            <h3>Tags</h3>
+            <div id="tagPills"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>
+        This is a <strong>fan-made</strong> single-file wiki for Five Nights at Freddy's animatronics. 
+        Images use placeholders — replace any <code>image</code> URL with your own. 
+        Content is for fan-creation and educational purposes.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // === Data model ===
+    // NOTE: This is a curated starter set. You can add more entries by pushing to ANIMATRONICS.
+    // Each entry:
+    // { id, name, image, appearances: { games: [...], books: [...] }, firstAppearance: 'FNaF 1', behavior: '...', strategies: ['...'], tags: ['...'] }
+
+    const PH = (name) => `https://via.placeholder.com/640x480.png?text=${encodeURIComponent(name)}`; // placeholder image
+
+    const ANIMATRONICS = [
+      // ==== FNaF 1 ====
+      {
+        id: 'freddy_fazbear', name: 'Freddy Fazbear', image: PH('Freddy Fazbear'),
+        appearances: { games: ['FNaF 1', 'FNaF 2 (Withered)', 'Ultimate Custom Night', 'Help Wanted (VR)'], books: ['Books — Original Trilogy (inspired)'] },
+        firstAppearance: 'FNaF 1',
+        behavior: 'Moves later in the night; tracks the player via camera audio cues. Attacks through the right door if power is out or if the door is open after his approach.',
+        strategies: ['Listen for his deep laugh to track movement.', 'Keep right door closed when he is at the corner.', 'Conserve power; he is more active at low power.'],
+        tags: ['classic', 'bear', 'leader']
+      },
+      { id: 'bonnie', name: 'Bonnie', image: PH('Bonnie'),
+        appearances: { games: ['FNaF 1', 'FNaF 2 (Withered)', 'Ultimate Custom Night', 'Help Wanted (VR)'], books: [] },
+        firstAppearance: 'FNaF 1',
+        behavior: 'Aggressive hallway approach from the left; frequently checks door lights. Moves quickly on some nights.',
+        strategies: ['Check left door light frequently.', 'Close left door when his silhouette is in the window.', 'Use cameras sparingly to conserve power.'],
+        tags: ['classic', 'bunny']
+      },
+      { id: 'chica', name: 'Chica', image: PH('Chica'),
+        appearances: { games: ['FNaF 1', 'FNaF 2 (Withered)', 'Ultimate Custom Night', 'Help Wanted (VR)'], books: [] },
+        firstAppearance: 'FNaF 1',
+        behavior: 'Approaches right door; can linger. Kitchen noise often cues her location when cameras are disabled.',
+        strategies: ['Monitor right door light often.', 'Close right door when she is at the window.', 'Kitchen clattering indicates presence.'],
+        tags: ['classic', 'chicken']
+      },
+      { id: 'foxy', name: 'Foxy', image: PH('Foxy'),
+        appearances: { games: ['FNaF 1', 'FNaF 2 (Withered Foxy)', 'Ultimate Custom Night', 'Help Wanted (VR)'], books: [] },
+        firstAppearance: 'FNaF 1',
+        behavior: 'Stays in Pirate Cove; becomes active if not watched. Rushes down the hall to the left door when agitated.',
+        strategies: ['Check Pirate Cove periodically to slow him.', 'Close left door immediately if he sprints.', 'Balance camera checks with power usage.'],
+        tags: ['classic', 'fox', 'fast']
+      },
+      { id: 'golden_freddy', name: 'Golden Freddy', image: PH('Golden Freddy'),
+        appearances: { games: ['FNaF 1', 'FNaF 2'], books: ['Books — Original Trilogy (Fredbear inspirations)'] },
+        firstAppearance: 'FNaF 1',
+        behavior: 'Rare hallucination-like appearances; can crash the game or insta-kill if not reacted to.',
+        strategies: ['Quickly flip camera or close doors when his poster changes.', 'Avoid staring at the hallucination.'],
+        tags: ['secret', 'rare']
+      },
+
+      // ==== FNaF 2 ====
+      { id: 'toy_freddy', name: 'Toy Freddy', image: PH('Toy Freddy'),
+        appearances: { games: ['FNaF 2', 'Ultimate Custom Night'], books: [] },
+        firstAppearance: 'FNaF 2',
+        behavior: 'Approaches via hallway; slower than other toys.',
+        strategies: ['Wear the Freddy mask when he enters the office.', 'Track hallway for silhouette.'],
+        tags: ['toy', 'bear']
+      },
+      { id: 'toy_bonnie', name: 'Toy Bonnie', image: PH('Toy Bonnie'),
+        appearances: { games: ['FNaF 2', 'Ultimate Custom Night'], books: [] },
+        firstAppearance: 'FNaF 2',
+        behavior: 'Long office stare before attack.',
+        strategies: ['Put on the Freddy mask quickly when he is in the office.', 'Watch vent camera cues.'],
+        tags: ['toy', 'bunny']
+      },
+      { id: 'toy_chica', name: 'Toy Chica', image: PH('Toy Chica'),
+        appearances: { games: ['FNaF 2', 'Ultimate Custom Night'], books: [] },
+        firstAppearance: 'FNaF 2',
+        behavior: 'Uses vents; enters office silently.',
+        strategies: ['Mask up immediately upon entry.', 'Check vent lights.'],
+        tags: ['toy', 'chicken']
+      },
+      { id: 'mangle', name: 'Mangle', image: PH('Mangle'),
+        appearances: { games: ['FNaF 2', 'Ultimate Custom Night', 'FNaF AR'], books: [] },
+        firstAppearance: 'FNaF 2',
+        behavior: 'Audio-heavy cues from the ceiling; can disable systems.',
+        strategies: ['Sound cues are key; use mask when in office.', 'Keep track of vent progression.'],
+        tags: ['toy', 'fox', 'audio']
+      },
+      { id: 'balloon_boy', name: 'Balloon Boy (BB)', image: PH('Balloon Boy'),
+        appearances: { games: ['FNaF 2', 'Ultimate Custom Night', 'FNaF AR'], books: [] },
+        firstAppearance: 'FNaF 2',
+        behavior: 'Disables flashlight; appears in left vent with distinctive laughter.',
+        strategies: ['Use mask quickly when he peeks from the vent.', 'Avoid letting him fully enter to keep flashlight.'],
+        tags: ['humanlike', 'support']
+      },
+      { id: 'jj', name: 'JJ (Balloon Girl)', image: PH('JJ'),
+        appearances: { games: ['FNaF 2 (Easter egg)'], books: [] },
+        firstAppearance: 'FNaF 2',
+        behavior: 'Rare office peek underneath desk.',
+        strategies: ['No direct threat; observation only.'],
+        tags: ['secret']
+      },
+      { id: 'puppet', name: 'The Puppet / Marionette', image: PH('The Puppet'),
+        appearances: { games: ['FNaF 2', 'FNaF 6 (Security Puppet)', 'Ultimate Custom Night'], books: ['Books — Original Trilogy (inspired)'] },
+        firstAppearance: 'FNaF 2',
+        behavior: 'Escapes if music box is unwound; will attack quickly thereafter.',
+        strategies: ['Keep music box wound via camera interface.', 'Prioritize over other threats.'],
+        tags: ['core', 'music_box']
+      },
+      { id: 'withered_freddy', name: 'Withered Freddy', image: PH('Withered Freddy'),
+        appearances: { games: ['FNaF 2'], books: [] },
+        firstAppearance: 'FNaF 2', behavior: 'Hallway approach; slower than Bonnie.',
+        strategies: ['Use mask when he enters.', 'Monitor hallway silhouette.'], tags: ['withered']
+      },
+      { id: 'withered_bonnie', name: 'Withered Bonnie', image: PH('Withered Bonnie'),
+        appearances: { games: ['FNaF 2'], books: [] },
+        firstAppearance: 'FNaF 2', behavior: 'Rapid office entry; headless design.',
+        strategies: ['Mask quickly upon office entry.'], tags: ['withered']
+      },
+      { id: 'withered_chica', name: 'Withered Chica', image: PH('Withered Chica'),
+        appearances: { games: ['FNaF 2'], books: [] },
+        firstAppearance: 'FNaF 2', behavior: 'Vent crawler; wide jaw blocks vent.',
+        strategies: ['Mask when she peeks; be quick.'], tags: ['withered']
+      },
+      { id: 'withered_foxy', name: 'Withered Foxy', image: PH('Withered Foxy'),
+        appearances: { games: ['FNaF 2'], books: [] },
+        firstAppearance: 'FNaF 2', behavior: 'Approaches hallway and is countered by flashlight stuns.',
+        strategies: ['Flash intermittently to repel.', 'Balance battery usage.'], tags: ['withered', 'flashlight']
+      },
+      { id: 'shadow_bonnie', name: 'Shadow Bonnie (RWQFSFASXC)', image: PH('Shadow Bonnie'),
+        appearances: { games: ['FNaF 2 (Easter egg)', 'Ultimate Custom Night'], books: [] },
+        firstAppearance: 'FNaF 2', behavior: 'Rare appearances; can crash the game in FNaF 2.',
+        strategies: ['Avoid prolonged staring; not a direct threat except easter egg.'], tags: ['shadow', 'secret']
+      },
+      { id: 'shadow_freddy', name: 'Shadow Freddy', image: PH('Shadow Freddy'),
+        appearances: { games: ['FNaF 2 (Easter egg)', 'FNaF 3 (minigames)'], books: [] },
+        firstAppearance: 'FNaF 2', behavior: 'Easter egg presence.',
+        strategies: ['Observation only in most cases.'], tags: ['shadow', 'secret']
+      },
+
+      // ==== FNaF 3 ====
+      { id: 'springtrap', name: 'Springtrap', image: PH('Springtrap'),
+        appearances: { games: ['FNaF 3', 'Pizzeria Simulator (Scraptrap)', 'Ultimate Custom Night', 'Help Wanted (VR)'], books: ['Books — Original Trilogy'] },
+        firstAppearance: 'FNaF 3',
+        behavior: 'Single physical animatronic in FNaF 3; moves room-to-room, attracted by audio lures. Vents are used to flank.',
+        strategies: ['Use audio lure to keep him in distant rooms.', 'Seal vents based on his position.', 'Repair systems quickly to avoid blindness and audio loss.'],
+        tags: ['springlock', 'william_afton']
+      },
+      { id: 'phantom_freddy', name: 'Phantom Freddy', image: PH('Phantom Freddy'),
+        appearances: { games: ['FNaF 3'], books: [] }, firstAppearance: 'FNaF 3',
+        behavior: 'Hallucination that causes disruptions upon camera/view contact.',
+        strategies: ['Avoid staring; switch cameras or put down monitor.'], tags: ['phantom']
+      },
+      { id: 'phantom_foxy', name: 'Phantom Foxy', image: PH('Phantom Foxy'),
+        appearances: { games: ['FNaF 3'], books: [] }, firstAppearance: 'FNaF 3',
+        behavior: 'Jumpscare on close contact causing system errors.', strategies: ['Keep distance on camera; avoid office approach.'], tags: ['phantom']
+      },
+      { id: 'phantom_chica', name: 'Phantom Chica', image: PH('Phantom Chica'),
+        appearances: { games: ['FNaF 3'], books: [] }, firstAppearance: 'FNaF 3',
+        behavior: 'Causes visual interference upon exposure.', strategies: ['Switch camera quickly.'], tags: ['phantom']
+      },
+      { id: 'phantom_bb', name: 'Phantom Balloon Boy', image: PH('Phantom Balloon Boy'),
+        appearances: { games: ['FNaF 3'], books: [] }, firstAppearance: 'FNaF 3',
+        behavior: 'Pops up on cameras; causes system failures if stared at.', strategies: ['Flip cameras swiftly.'], tags: ['phantom']
+      },
+      { id: 'phantom_mangle', name: 'Phantom Mangle', image: PH('Phantom Mangle'),
+        appearances: { games: ['FNaF 3'], books: [] }, firstAppearance: 'FNaF 3',
+        behavior: 'Audio disruption and office interference.', strategies: ['Avoid triggering via cameras; recover systems.'], tags: ['phantom']
+      },
+      { id: 'phantom_puppet', name: 'Phantom Puppet', image: PH('Phantom Puppet'),
+        appearances: { games: ['FNaF 3'], books: [] }, firstAppearance: 'FNaF 3',
+        behavior: 'Blocks view; forces system failure and time loss.', strategies: ['Prevent activation by avoiding direct camera contact.'], tags: ['phantom']
+      },
+
+      // ==== FNaF 4 ====
+      { id: 'nightmare_freddy', name: 'Nightmare Freddy', image: PH('Nightmare Freddy'),
+        appearances: { games: ['FNaF 4', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'FNaF 4',
+        behavior: 'Freddles accumulate on bed; spawns attack when unaddressed.', strategies: ['Check bed often; flashlight to disperse Freddles.'], tags: ['nightmare']
+      },
+      { id: 'nightmare_bonnie', name: 'Nightmare Bonnie', image: PH('Nightmare Bonnie'),
+        appearances: { games: ['FNaF 4', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'FNaF 4',
+        behavior: 'Approaches door; breathing cues are critical.', strategies: ['Listen; close door when breathing is heard; flashlight to check hall.'], tags: ['nightmare']
+      },
+      { id: 'nightmare_chica', name: 'Nightmare Chica', image: PH('Nightmare Chica'),
+        appearances: { games: ['FNaF 4', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'FNaF 4',
+        behavior: 'Right door approach; kitchen sounds as cue.', strategies: ['Use audio to time door closures; flashlight sparingly.'], tags: ['nightmare']
+      },
+      { id: 'nightmare_foxy', name: 'Nightmare Foxy', image: PH('Nightmare Foxy'),
+        appearances: { games: ['FNaF 4', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'FNaF 4',
+        behavior: 'Invades closet; grows more active if unchecked.', strategies: ['Check closet frequently; shut door until he calms.'], tags: ['nightmare']
+      },
+      { id: 'nightmare_fredbear', name: 'Nightmare Fredbear', image: PH('Nightmare Fredbear'),
+        appearances: { games: ['FNaF 4'], books: [] }, firstAppearance: 'FNaF 4',
+        behavior: 'Advanced late-night aggressor; teleports between doors.', strategies: ['Track laughter for position changes; react quickly at doors.'], tags: ['nightmare', 'boss']
+      },
+      { id: 'nightmare', name: 'Nightmare', image: PH('Nightmare'),
+        appearances: { games: ['FNaF 4 (Hard mode)'], books: [] }, firstAppearance: 'FNaF 4',
+        behavior: 'Extremely aggressive version of Fredbear.', strategies: ['Same as Fredbear with tighter timing.'], tags: ['nightmare', 'boss']
+      },
+      { id: 'plushtrap', name: 'Plushtrap', image: PH('Plushtrap'),
+        appearances: { games: ['FNaF 4'], books: [] }, firstAppearance: 'FNaF 4',
+        behavior: 'Mini-game timing challenge on chair.', strategies: ['Wait for movement sounds; flashlight at precise timing.'], tags: ['mini_game']
+      },
+      { id: 'nightmare_bb', name: 'Nightmare Balloon Boy', image: PH('Nightmare Balloon Boy'),
+        appearances: { games: ['FNaF 4: Halloween'], books: [] }, firstAppearance: 'FNaF 4',
+        behavior: 'Hall timing jumpscare mini-game.', strategies: ['Similar to Plushtrap timing.'], tags: ['nightmare']
+      },
+      { id: 'jack_o_chica', name: 'Jack-O-Chica', image: PH('Jack-O-Chica'),
+        appearances: { games: ['FNaF 4: Halloween'], books: [] }, firstAppearance: 'FNaF 4',
+        behavior: 'Heat-themed variant causing faster attacks.', strategies: ['Manage timing and door checks quickly.'], tags: ['variant']
+      },
+      { id: 'nightmarionne', name: 'Nightmarionne', image: PH('Nightmarionne'),
+        appearances: { games: ['FNaF 4: Halloween', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'FNaF 4',
+        behavior: 'Tall Puppet variant that punishes light usage.', strategies: ['Avoid excessive light; watch for visual distortions.'], tags: ['nightmare']
+      },
+
+      // ==== Sister Location ====
+      { id: 'circus_baby', name: 'Circus Baby', image: PH('Circus Baby'),
+        appearances: { games: ['Sister Location', 'Pizzeria Simulator (Scrap Baby)'], books: ['Books — Original Trilogy (inspired)'] },
+        firstAppearance: 'Sister Location', behavior: 'Narrative-focused guidance; becomes hostile in later segments.',
+        strategies: ['Follow instructions early; later use stealth and controlled shocks as directed.'], tags: ['core']
+      },
+      { id: 'ballora', name: 'Ballora', image: PH('Ballora'),
+        appearances: { games: ['Sister Location', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'Sister Location',
+        behavior: 'Audio-guided movement; proximity detection through music volume.', strategies: ['Move slowly when music is loud; stop when close.'], tags: ['ballet', 'audio']
+      },
+      { id: 'funtime_freddy', name: 'Funtime Freddy (+ Bon-Bon)', image: PH('Funtime Freddy'),
+        appearances: { games: ['Sister Location', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'Sister Location',
+        behavior: 'Calls and ambushes; Bon-Bon used for attacks.', strategies: ['Controlled shocks to reset behavior; listen for cues.'], tags: ['funtime', 'duo']
+      },
+      { id: 'funtime_foxy', name: 'Funtime Foxy', image: PH('Funtime Foxy'),
+        appearances: { games: ['Sister Location', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'Sister Location',
+        behavior: 'Movement based on observation timing; jumpscare if line-of-sight not managed.', strategies: ['Use timed flashlight checks; avoid sprinting.'], tags: ['funtime']
+      },
+      { id: 'ennard', name: 'Ennard', image: PH('Ennard'),
+        appearances: { games: ['Sister Location', 'Pizzeria Simulator (Molten Freddy)'], books: [] }, firstAppearance: 'Sister Location',
+        behavior: 'Composite animatronic; final segment pursuer.', strategies: ['Follow route management; use controlled vents/power.'], tags: ['composite']
+      },
+      { id: 'bidybab', name: 'Bidybab', image: PH('Bidybab'), appearances: { games: ['Sister Location'], books: [] }, firstAppearance: 'Sister Location', behavior: 'Vent crawlers.', strategies: ['Close vent when active; listen for movement.'], tags: ['minion'] },
+      { id: 'minireena', name: 'Minireena', image: PH('Minireena'), appearances: { games: ['Sister Location'], books: [] }, firstAppearance: 'Sister Location', behavior: 'Obstruct vision; clog systems.', strategies: ['Clear obstructions via scripted events.'], tags: ['minion'] },
+      { id: 'bonnet', name: 'Bonnet', image: PH('Bonnet'), appearances: { games: ['Sister Location (Custom Night)'], books: [] }, firstAppearance: 'Sister Location', behavior: 'Walks across office; click nose to repel.', strategies: ['Click interaction to dismiss.'], tags: ['custom_night'] },
+      { id: 'lolbit', name: 'Lolbit', image: PH('Lolbit'), appearances: { games: ['Sister Location (Custom Night)'], books: [] }, firstAppearance: 'Sister Location', behavior: 'Screen takeover; type code to remove.', strategies: ['Type L-O-L quickly.'], tags: ['custom_night'] },
+      { id: 'yendo', name: 'Yendo', image: PH('Yendo'), appearances: { games: ['Sister Location (Custom Night)'], books: [] }, firstAppearance: 'Sister Location', behavior: 'Office invader.', strategies: ['Monitor door states; timed responses.'], tags: ['custom_night'] },
+
+      // ==== Pizzeria Simulator (FNaF 6) & Rockstar Era ====
+      { id: 'scrap_baby', name: 'Scrap Baby', image: PH('Scrap Baby'), appearances: { games: ['Pizzeria Simulator'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Aggressive in salvaging; office ambusher.', strategies: ['Audio and taser timing in salvage; monitor vents late-game.'], tags: ['scrap'] },
+      { id: 'molten_freddy', name: 'Molten Freddy', image: PH('Molten Freddy'), appearances: { games: ['Pizzeria Simulator'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Vent-based attacks using audio cues.', strategies: ['Use audio lure and vent monitoring.'], tags: ['scrap'] },
+      { id: 'scraptrap', name: 'Scraptrap (William Afton)', image: PH('Scraptrap'), appearances: { games: ['Pizzeria Simulator'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Office attacker with strategic routes.', strategies: ['Auditory tracking; controlled door usage.'], tags: ['scrap'] },
+      { id: 'lefty', name: 'Lefty', image: PH('Lefty'), appearances: { games: ['Pizzeria Simulator'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Captures Puppet; silent approaches.', strategies: ['Audio management; careful monitoring.'], tags: ['rockstar'] },
+
+      { id: 'rockstar_freddy', name: 'Rockstar Freddy', image: PH('Rockstar Freddy'), appearances: { games: ['Pizzeria Simulator', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Coins mechanic in UCN.', strategies: ['Pay coins to calm; avoid voice triggers.'], tags: ['rockstar'] },
+      { id: 'rockstar_bonnie', name: 'Rockstar Bonnie', image: PH('Rockstar Bonnie'), appearances: { games: ['Pizzeria Simulator', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Guitar item interactions.', strategies: ['Avoid clicking guitar poster unless ready.'], tags: ['rockstar'] },
+      { id: 'rockstar_chica', name: 'Rockstar Chica', image: PH('Rockstar Chica'),
+        appearances: { games: ['Pizzeria Simulator', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Door blocking with beak mechanics.', strategies: ['Open/close doors based on beak position.'], tags: ['rockstar'] },
+      { id: 'rockstar_foxy', name: 'Rockstar Foxy', image: PH('Rockstar Foxy'), appearances: { games: ['Pizzeria Simulator', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Parrot offers random boons/banes.', strategies: ['Use parrot only when beneficial.'], tags: ['rockstar'] },
+
+      { id: 'mr_hippo', name: 'Mr. Hippo', image: PH('Mr. Hippo'), appearances: { games: ['Pizzeria Simulator', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Long post-jumpscare monologues.', strategies: ['Prevent attack via standard office management.'], tags: ['mediocre_melodies'] },
+      { id: 'pigpatch', name: 'Pigpatch', image: PH('Pigpatch'), appearances: { games: ['Pizzeria Simulator', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Basic office approach.', strategies: ['Monitor doorways.'], tags: ['mediocre_melodies'] },
+      { id: 'nedd_bear', name: 'Nedd Bear', image: PH('Nedd Bear'), appearances: { games: ['Pizzeria Simulator', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Simple routes.', strategies: ['Standard door checks.'], tags: ['mediocre_melodies'] },
+      { id: 'orville_elephant', name: 'Orville Elephant', image: PH('Orville Elephant'), appearances: { games: ['Pizzeria Simulator', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Magic theme; moderate activity.', strategies: ['Watch lanes; react to cues.'], tags: ['mediocre_melodies'] },
+
+      { id: 'music_man', name: 'Music Man', image: PH('Music Man'), appearances: { games: ['Pizzeria Simulator', 'Ultimate Custom Night', 'Security Breach (DJ Music Man)'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Audio-reactive; DJ variant chases in SB.', strategies: ['Keep noise down in UCN; in SB, evade during chase segments.'], tags: ['audio'] },
+      { id: 'el_chip', name: 'El Chip', image: PH('El Chip'), appearances: { games: ['Pizzeria Simulator', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Ad interruptions in UCN.', strategies: ['Mute ads quickly.'], tags: ['vendor'] },
+      { id: 'funtime_chica', name: 'Funtime Chica', image: PH('Funtime Chica'), appearances: { games: ['Pizzeria Simulator', 'Ultimate Custom Night'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Visual-only in some modes.', strategies: ['Non-lethal in certain appearances.'], tags: ['funtime'] },
+      { id: 'security_puppet', name: 'Security Puppet', image: PH('Security Puppet'), appearances: { games: ['Pizzeria Simulator'], books: [] }, firstAppearance: 'Pizzeria Simulator', behavior: 'Lore role; protects child in minigame.', strategies: ['N/A game strategy; story significance.'], tags: ['puppet'] },
+
+      // ==== Ultimate Custom Night ====
+      { id: 'dee_dee', name: 'Dee Dee', image: PH('Dee Dee'), appearances: { games: ['Ultimate Custom Night'], books: [] }, firstAppearance: 'Ultimate Custom Night', behavior: 'Adds random characters during play.', strategies: ['Plan for unpredictability; manage added threats.'], tags: ['random'] },
+      { id: 'xor', name: 'XOR (Shadow Dee Dee)', image: PH('XOR'), appearances: { games: ['Ultimate Custom Night'], books: [] }, firstAppearance: 'Ultimate Custom Night', behavior: 'Stronger version of Dee Dee.', strategies: ['Similar management with higher difficulty.'], tags: ['shadow'] },
+
+      // ==== Help Wanted (VR) & Halloween ====
+      { id: 'glitchtrap', name: 'Glitchtrap (Malhare)', image: PH('Glitchtrap'), appearances: { games: ['Help Wanted (VR)', 'Security Breach (influence)'], books: ['Books — Tales from the Pizzaplex (The Mimic connections)'] }, firstAppearance: 'Help Wanted (VR)', behavior: 'Digital entity manipulating events behind the scenes.', strategies: ['Complete VR tasks; avoid corrupted inputs.'], tags: ['digital', 'villain'] },
+      { id: 'dreadbear', name: 'Dreadbear', image: PH('Dreadbear'), appearances: { games: ['Help Wanted (DLC)'], books: [] }, firstAppearance: 'Help Wanted (VR)', behavior: 'Halloween-themed boss.', strategies: ['Follow mini-game mechanics precisely.'], tags: ['halloween'] },
+      { id: 'grim_foxy', name: 'Grimm Foxy', image: PH('Grimm Foxy'), appearances: { games: ['Help Wanted (DLC)'], books: [] }, firstAppearance: 'Help Wanted (VR)', behavior: 'Fast chaser.', strategies: ['Maintain line-of-sight management.'], tags: ['halloween'] },
+
+      // ==== Security Breach & RUIN ====
+      { id: 'glamrock_freddy', name: 'Glamrock Freddy', image: PH('Glamrock Freddy'), appearances: { games: ['Security Breach', 'RUIN (DLC)'], books: [] }, firstAppearance: 'Security Breach', behavior: 'Ally character assisting the player.', strategies: ['Use Freddy to bypass hostile areas; manage battery.'], tags: ['ally'] },
+      { id: 'glamrock_chica', name: 'Glamrock Chica', image: PH('Glamrock Chica'), appearances: { games: ['Security Breach', 'RUIN (DLC)'], books: [] }, firstAppearance: 'Security Breach', behavior: 'Patrols areas; pursues upon detection.', strategies: ['Hide in strollers/bins; use distractions; stun with Fazerblaster/Faz-Cam.'], tags: ['glamrock'] },
+      { id: 'roxanne_wolf', name: 'Roxanne Wolf', image: PH('Roxanne Wolf'), appearances: { games: ['Security Breach', 'RUIN (DLC)'], books: [] }, firstAppearance: 'Security Breach', behavior: 'Aggressive chaser with self-confidence lines; blinded later.', strategies: ['Use cover; sprint routes; tools to stun.'], tags: ['glamrock'] },
+      { id: 'montgomery_gator', name: 'Montgomery Gator', image: PH('Montgomery Gator'), appearances: { games: ['Security Breach', 'RUIN (DLC)'], books: [] }, firstAppearance: 'Security Breach', behavior: 'High-speed chases; powerful jumps.', strategies: ['Keep distance; use splash area routes; stun when needed.'], tags: ['glamrock'] },
+      { id: 'sun', name: 'Sun (Daycare Attendant)', image: PH('Sun (Daycare Attendant)'), appearances: { games: ['Security Breach', 'RUIN (DLC)'], books: [] }, firstAppearance: 'Security Breach', behavior: 'Friendly while lights on; strict about rules.', strategies: ['Keep lights on to avoid Moon.'], tags: ['daycare'] },
+      { id: 'moon', name: 'Moon (Daycare Attendant)', image: PH('Moon (Daycare Attendant)'), appearances: { games: ['Security Breach', 'RUIN (DLC)'], books: [] }, firstAppearance: 'Security Breach', behavior: 'Hostile in darkness; hunts relentlessly.', strategies: ['Restore power quickly; avoid dark zones.'], tags: ['daycare'] },
+      { id: 'dj_music_man', name: 'DJ Music Man', image: PH('DJ Music Man'), appearances: { games: ['Security Breach', 'RUIN (DLC)'], books: [] }, firstAppearance: 'Security Breach', behavior: 'Large chaser in Arcade; environmental obstacles.', strategies: ['Follow route and avoid tentacles; keep moving.'], tags: ['boss'] },
+      { id: 'burntrap', name: 'Burntrap (Afton)', image: PH('Burntrap'), appearances: { games: ['Security Breach'], books: [] }, firstAppearance: 'Security Breach', behavior: 'Final antagonist controlling other animatronics.', strategies: ['Complete ending mechanics; avoid control takeover.'], tags: ['villain'] },
+      { id: 'blob', name: 'The Blob', image: PH('The Blob'), appearances: { games: ['Security Breach'], books: [] }, firstAppearance: 'Security Breach', behavior: 'Mass of parts; reacts in ending sequences.', strategies: ['Story-driven encounters.'], tags: ['composite'] },
+
+      // ==== Books — Original Trilogy & Twisted ====
+      { id: 'twisted_freddy', name: 'Twisted Freddy', image: PH('Twisted Freddy'), appearances: { games: [], books: ['Books — Original Trilogy (The Twisted Ones)'] }, firstAppearance: 'Books — Original Trilogy', behavior: 'Burrowing/illusion-based animatronic.', strategies: ['Break illusions; avoid lure traps.'], tags: ['twisted'] },
+      { id: 'twisted_bonnie', name: 'Twisted Bonnie', image: PH('Twisted Bonnie'), appearances: { games: [], books: ['Books — Original Trilogy (The Twisted Ones)'] }, firstAppearance: 'Books — Original Trilogy', behavior: 'Illusion-based attacks.', strategies: ['Exploit signal interference; destroy control nodes.'], tags: ['twisted'] },
+      { id: 'twisted_chica', name: 'Twisted Chica', image: PH('Twisted Chica'), appearances: { games: [], books: ['Books — Original Trilogy (The Twisted Ones)'] }, firstAppearance: 'Books — Original Trilogy', behavior: 'Gastro trap theming; uses lure scents.', strategies: ['Avoid proximity; neutralize control devices.'], tags: ['twisted'] },
+      { id: 'twisted_foxy', name: 'Twisted Foxy', image: PH('Twisted Foxy'), appearances: { games: [], books: ['Books — Original Trilogy (The Twisted Ones)'] }, firstAppearance: 'Books — Original Trilogy', behavior: 'Burrows; surprise attacks.', strategies: ['Use terrain awareness and signals.'], tags: ['twisted'] },
+      { id: 'twisted_wolf', name: 'Twisted Wolf', image: PH('Twisted Wolf'), appearances: { games: [], books: ['Books — Original Trilogy (The Twisted Ones)'] }, firstAppearance: 'Books — Original Trilogy', behavior: 'Hybrid animatronic with organic-like parts.', strategies: ['Target weak points; disrupt control signals.'], tags: ['twisted'] },
+
+      // ==== Fazbear Frights & Tales from the Pizzaplex — samplers ====
+      { id: 'stitchwraith', name: 'The Stitchwraith', image: PH('Stitchwraith'), appearances: { games: [], books: ['Books — Fazbear Frights'] }, firstAppearance: 'Books — Fazbear Frights', behavior: 'Entity composed of animatronic and human remnants.', strategies: ['Story-centric; no gameplay.'], tags: ['entity'] },
+      { id: 'mimic', name: 'The Mimic', image: PH('The Mimic'), appearances: { games: ['RUIN (DLC)'], books: ['Books — Tales from the Pizzaplex'] }, firstAppearance: 'Books — Tales from the Pizzaplex', behavior: 'Imitates voices and behavior; manipulative AI.', strategies: ['Avoid lures; follow puzzle mechanics in RUIN.'], tags: ['ai', 'villain'] },
+    ];
+
+    // === Rendering & UI logic ===
+    const grid = document.getElementById('grid');
+    const q = document.getElementById('q');
+    const series = document.getElementById('series');
+    const sortSel = document.getElementById('sort');
+    const countBadge = document.getElementById('countBadge');
+
+    const backdrop = document.getElementById('backdrop');
+    const closeBtn = document.getElementById('closeBtn');
+    const modalName = document.getElementById('modalName');
+    const modalImg = document.getElementById('modalImg');
+    const modalBehavior = document.getElementById('modalBehavior');
+    const modalStrategies = document.getElementById('modalStrategies');
+    const appearancePills = document.getElementById('appearancePills');
+    const tagPills = document.getElementById('tagPills');
+
+    function sanitize(str) { return (str || '').toString(); }
+
+    function renderCards(list) {
+      grid.innerHTML = '';
+      list.forEach(item => {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-label', item.name);
+        card.innerHTML = `
+          <div class="thumb">
+            <img src="${sanitize(item.image)}" alt="${sanitize(item.name)} image" loading="lazy" />
+          </div>
+          <div class="meta">
+            <div class="name">${sanitize(item.name)}</div>
+            <div class="chips">
+              ${(item.appearances.games || []).slice(0, 2).map(g => `<span class='chip'>${sanitize(g)}</span>`).join('')}
+              ${(item.appearances.books || []).slice(0, 1).map(b => `<span class='chip'>${sanitize(b)}</span>`).join('')}
+            </div>
+          </div>
+        `;
+        card.addEventListener('click', () => openModal(item));
+        card.addEventListener('keydown', (e) => { if (e.key === 'Enter') openModal(item); });
+        grid.appendChild(card);
+      });
+      countBadge.textContent = `${list.length} shown`;
+    }
+
+    function openModal(item) {
+      modalName.textContent = item.name;
+      modalImg.src = item.image;
+      modalImg.alt = item.name;
+      modalBehavior.textContent = item.behavior;
+      modalStrategies.innerHTML = '';
+      (item.strategies || []).forEach(s => {
+        const li = document.createElement('li');
+        li.textContent = s;
+        modalStrategies.appendChild(li);
+      });
+      appearancePills.innerHTML = '';
+      (item.appearances.games || []).forEach(g => {
+        const span = document.createElement('span');
+        span.className = 'pill';
+        span.textContent = g;
+        appearancePills.appendChild(span);
+      });
+      (item.appearances.books || []).forEach(b => {
+        const span = document.createElement('span');
+        span.className = 'pill';
+        span.textContent = b;
+        appearancePills.appendChild(span);
+      });
+      tagPills.innerHTML = '';
+      (item.tags || []).forEach(t => {
+        const span = document.createElement('span');
+        span.className = 'pill';
+        span.textContent = t;
+        tagPills.appendChild(span);
+      });
+      backdrop.style.display = 'flex';
+      backdrop.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeModal() {
+      backdrop.style.display = 'none';
+      backdrop.setAttribute('aria-hidden', 'true');
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    // === Filtering & Sorting ===
+    function normalize(str) { return (str || '').toLowerCase(); }
+
+    function applyFilters() {
+      const term = normalize(q.value);
+      const ser = normalize(series.value);
+      const sortBy = sortSel.value;
+
+      let list = ANIMATRONICS.filter(a => {
+        const hay = [
+          a.name,
+          a.firstAppearance,
+          ...(a.appearances.games || []),
+          ...(a.appearances.books || []),
+          ...(a.tags || [])
+        ].map(normalize).join(' \n ');
+        const matchesTerm = !term || hay.includes(term);
+        const matchesSeries = !ser || hay.includes(ser);
+        return matchesTerm && matchesSeries;
+      });
+
+      if (sortBy === 'name') {
+        list.sort((x, y) => x.name.localeCompare(y.name));
+      } else if (sortBy === 'game') {
+        list.sort((x, y) => (x.firstAppearance || '').localeCompare(y.firstAppearance || ''));
+      }
+
+      renderCards(list);
+    }
+
+    q.addEventListener('input', applyFilters);
+    series.addEventListener('change', applyFilters);
+    sortSel.addEventListener('change', applyFilters);
+
+    // Initial render
+    renderCards(ANIMATRONICS.sort((a,b)=>a.name.localeCompare(b.name)));
+
+    // --- Developer/Jesse tips ---
+    // 1) To add more characters, append objects to ANIMATRONICS. Keep fields short and original (no copied book/game text).
+    // 2) Replace the placeholder image URL with your preferred image source or local file path.
+    // 3) All content is contained in this single HTML file.
+  </script>
+</body>
+</html>

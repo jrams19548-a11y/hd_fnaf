@@ -262,6 +262,12 @@
             await intercept();
 
             fadeOutAndStop(loadingAudio, 1000);
+            // Fade out the launcher UI (keep canvas visible)
+            fadeOutElement('#selection', 1000);
+            fadeOutElement('.tips-container', 1000);
+            fadeOutElement('.launcher-text', 1000);
+            fadeOutElement('.glitch', 1000);
+            fadeOutElement('.vignette', 1000);
             hideTips();
 
             const script = document.createElement('script');
@@ -270,6 +276,7 @@
                 new Runtime("MMFCanvas", runtimecanvas);
             };
             document.getElementById('MMFCanvas').style.display = 'block';
+            document.body.classList.add('game-loaded');
             document.getElementById('selection').style.display = 'none';
             document.title = gametitle;
             document.head.appendChild(script);

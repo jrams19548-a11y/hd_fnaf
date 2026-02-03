@@ -10,7 +10,8 @@
 
                   html { display:block; -webkit-user-select:none; -ms-user-select:none; user-select:none; overflow:hidden; height:100%; }
                   body { position:relative; margin:0; height:100%; color:#fff; font-family:'Fredoka', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; background: url('resources/office.png') center/cover no-repeat; background-attachment: fixed; }
-                  body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, rgba(10,10,10,0.7) 0%, rgba(26,10,26,0.7) 50%, rgba(15,15,31,0.7) 100%); pointer-events:none; z-index:1; }
+                  body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, rgba(10,10,10,0.7) 0%, rgba(26,10,26,0.7) 50%, rgba(15,15,31,0.7) 100%); pointer-events:none; z-index:1; transition: opacity 700ms ease; opacity:1; }
+                  body.game-loaded::before { opacity:0; }
 
                   .title-section { display:flex; align-items:center; justify-content:center; gap:30px; margin: 18px 0; }
                   .title-section h1 { font-family: 'Creepster', cursive; color:#ff4444; font-size:2.4rem; text-shadow: 0 0 10px rgba(255,68,68,0.8); }
@@ -18,8 +19,8 @@
 
                   .selection { width:100%; min-height: calc(100vh - 120px); display:flex; align-items:center; justify-content:center; position:relative; z-index: 4; }
                   .vignette, .glitch { position:fixed; inset:0; pointer-events:none; }
-                  .glitch { background-image: url(resources/background.gif); background-position:center; background-size:auto; background-repeat:repeat; opacity:0.75; z-index:2; }
-                  .vignette { z-index: 3; }
+                  .glitch { background-image: url(resources/background.gif); background-position:center; background-size:auto; background-repeat:repeat; opacity:0.75; z-index:2; transition: opacity 600ms ease; }
+                  .vignette { z-index: 3; opacity:1; transition: opacity 600ms ease; }
 
                   canvas { display:none; user-select:none; }
                   #title { position:absolute; top:8vh; left:5vw; z-index:2; height:20vh; }
@@ -100,11 +101,19 @@
                             audio.volume = start;
                         }
                     }, stepTime);
-                }
+                    }
 
-                tryPlayLoadingAudio();
+                    function fadeOutElement(selector, duration = 600) {
+                        const el = document.querySelector(selector);
+                        if (!el) return;
+                        el.style.transition = `opacity ${duration}ms ease`;
+                        el.style.opacity = '0';
+                        setTimeout(() => { try { el.style.display = 'none'; } catch(e) {} }, duration + 30);
+                    }
 
-                const parts = 20;
+                    tryPlayLoadingAudio();
+
+                    const parts = 20;
                 let gametitle, runtimecanvas
                 gametitle = document.title;
                 runtimecanvas = "resources/fnaf 4.cch";
@@ -265,6 +274,12 @@
                         await intercept();
 
                         fadeOutAndStop(loadingAudio, 1000);
+                        // Fade out the launcher UI (keep canvas visible)
+                        fadeOutElement('#selection', 1000);
+                        fadeOutElement('.tips-container', 1000);
+                        fadeOutElement('.launcher-text', 1000);
+                        fadeOutElement('.glitch', 1000);
+                        fadeOutElement('.vignette', 1000);
                         hideTips();
 
                         const script = document.createElement('script');
@@ -273,6 +288,7 @@
                             new Runtime("MMFCanvas", runtimecanvas);
                         };
                         document.getElementById('MMFCanvas').style.display = 'block';
+                        document.body.classList.add('game-loaded');
                         document.getElementById('selection').style.display = 'none';
                         document.title = gametitle;
                         document.head.appendChild(script);

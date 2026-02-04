@@ -7,34 +7,35 @@
     <title>Five Nights at Freddy's 3</title>
     <link rel="icon" href="favicon.ico" />
     <style>
-                      @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Fredoka:wght@400;700&display=swap');
+ @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Fredoka:wght@400;700&display=swap');
 
-            body::before { 
-                content: ''; 
-                position: fixed; 
-                top: 0; left: 0; 
-                width: 100%; height: 100%; 
-                background: linear-gradient(135deg, rgba(10,10,10,0.7) 0%, rgba(26,10,26,0.7) 50%, rgba(15,15,31,0.7) 100%); 
-                pointer-events: none; 
-                z-index: 1; 
-                transition: opacity 700ms ease; 
-                opacity: 1; 
-            }
-            body.game-loaded::before { 
-                opacity: 0; 
-            }
+      html { display:block; -webkit-user-select:none; -ms-user-select:none; user-select:none; overflow:hidden; height:100%; }
+
+      body {
+        position: relative; margin:0; height:100%; color:#fff;
+        font-family: 'Fredoka', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+        background: url('resources/office.png') center/cover no-repeat;
         background-attachment: fixed;
+        margin: 0; 
+        padding: 0;
+        display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;     /* Center vertically */
       }
 
-      body::before {
-        content: '';
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: linear-gradient(135deg, rgba(10,10,10,0.7) 0%, rgba(26,10,26,0.7) 50%, rgba(15,15,31,0.7) 100%);
-        pointer-events: none;
-        z-index: 1;
-      }
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0; left: 0;
+                width: 100%; height: 100%;
+                background: linear-gradient(135deg, rgba(10,10,10,0.7) 0%, rgba(26,10,26,0.7) 50%, rgba(15,15,31,0.7) 100%);
+                pointer-events: none;
+                z-index: 1;
+                transition: opacity 700ms ease;
+                opacity: 1;
+            }
+
+            body.game-loaded::before { opacity: 0; }
 
       .title-section { display:flex; align-items:center; justify-content:center; gap:30px; margin: 18px 0; }
       .title-section h1 { font-family: 'Creepster', cursive; color:#ff4444; font-size:2.4rem; text-shadow: 0 0 10px rgba(255,68,68,0.8); }
@@ -42,12 +43,12 @@
 
       .selection { width:100%; min-height: calc(100vh - 120px); display:flex; align-items:center; justify-content:center; position:relative; z-index: 4; }
 
-                .vignette, .glitch { position:fixed; inset:0; pointer-events:none; }
-                .glitch { background-image: url(resources/background.gif); background-position:center; background-size:auto; background-repeat:repeat; opacity:0.75; z-index:2; transition: opacity 600ms ease; }
-                .vignette { z-index: 3; opacity:1; transition: opacity 600ms ease; }
+    .vignette, .glitch { position:fixed; inset:0; pointer-events:none; }
+    .glitch { background-image: url(resources/background.gif); background-position:center; background-size:auto; background-repeat:repeat; opacity:0.75; z-index:2; transition: opacity 600ms ease; }
+    .vignette { z-index: 3; opacity:1; transition: opacity 600ms ease; }
       .vignette img { width:100%; height:100%; object-fit:cover; }
 
-      canvas { display:none; user-select:none; }
+      canvas { display:none; user-select:none}
 
       #title { position:absolute; top:8vh; left:5vw; z-index:2; height:20vh; }
       #animatronic { position:absolute; top:-5vh; right:7vw; height:120vh; z-index:1; }

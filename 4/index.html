@@ -6,36 +6,65 @@
                 <title>Five Nights at Freddy's 4</title>
                 <link rel="icon" href="favicon.ico" />
                 <style>
-                  @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Fredoka:wght@400;700&display=swap');
+ @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Fredoka:wght@400;700&display=swap');
 
-                  html { display:block; -webkit-user-select:none; -ms-user-select:none; user-select:none; overflow:hidden; height:100%; }
-                  body { position:relative; margin:0; height:100%; color:#fff; font-family:'Fredoka', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; background: url('resources/office.png') center/cover no-repeat; background-attachment: fixed; }
-                  body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, rgba(10,10,10,0.7) 0%, rgba(26,10,26,0.7) 50%, rgba(15,15,31,0.7) 100%); pointer-events:none; z-index:1; transition: opacity 700ms ease; opacity:1; }
-                  body.game-loaded::before { opacity:0; }
+      html { display:block; -webkit-user-select:none; -ms-user-select:none; user-select:none; overflow:hidden; height:100%; }
 
-                  .title-section { display:flex; align-items:center; justify-content:center; gap:30px; margin: 18px 0; }
-                  .title-section h1 { font-family: 'Creepster', cursive; color:#ff4444; font-size:2.4rem; text-shadow: 0 0 10px rgba(255,68,68,0.8); }
-                  .title-section img { height: 140px; filter: drop-shadow(0 0 20px rgba(255,68,68,0.4)); }
+      body {
+        position: relative; margin:0; height:100%; color:#fff;
+        font-family: 'Fredoka', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+        background: url('resources/office.png') center/cover no-repeat;
+        background-attachment: fixed;
+        margin: 0; 
+        padding: 0;
+        display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;     /* Center vertically */
+      }
 
-                  .selection { width:100%; min-height: calc(100vh - 120px); display:flex; align-items:center; justify-content:center; position:relative; z-index: 4; }
-                  .vignette, .glitch { position:fixed; inset:0; pointer-events:none; }
-                  .glitch { background-image: url(resources/background.gif); background-position:center; background-size:auto; background-repeat:repeat; opacity:0.75; z-index:2; transition: opacity 600ms ease; }
-                  .vignette { z-index: 3; opacity:1; transition: opacity 600ms ease; }
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0; left: 0;
+                width: 100%; height: 100%;
+                background: linear-gradient(135deg, rgba(10,10,10,0.7) 0%, rgba(26,10,26,0.7) 50%, rgba(15,15,31,0.7) 100%);
+                pointer-events: none;
+                z-index: 1;
+                transition: opacity 700ms ease;
+                opacity: 0.5;
+            }
 
-                  canvas { display:none; user-select:none; }
-                  #title { position:absolute; top:8vh; left:5vw; z-index:2; height:20vh; }
-                  #animatronic { position:absolute; top:-5vh; right:7vw; height:120vh; z-index:1; }
+            body.game-loaded::before { opacity: 0; }
 
-                  .loader { position:absolute; display:flex; flex-direction:column; align-items:center; left:50%; transform:translateX(-50%); bottom:10vh; z-index:3; color:#fff; font-family:'Fredoka', monospace; text-align:center; width:85vw; }
-                  .loader h1 { margin:0; font-size:5vw; color:#ff6b6b; text-shadow:0 0 8px rgba(255,68,68,0.6); }
-                  .loader hr { margin:8px 0; border:none; height:6px; width:0%; background: linear-gradient(90deg,#8b0000,#ff4444); border-radius:6px; }
-                  .loader h2 { margin:6px 0 0; font-size:1.1rem; color:#ccc; }
+      .title-section { display:flex; align-items:center; justify-content:center; gap:30px; margin: 18px 0; }
+      .title-section h1 { font-family: 'Creepster', cursive; color:#ff4444; font-size:2.4rem; text-shadow: 0 0 10px rgba(255,68,68,0.8); }
+      .title-section img { height: 140px; filter: drop-shadow(0 0 20px rgba(255,68,68,0.4)); }
 
-                  .tips-container { position:absolute; top:4vh; left:50%; transform:translateX(-50%); max-width:80vw; background: rgba(0,0,0,0.6); border:2px solid #8b0000; padding:14px; border-radius:8px; color:#fff; z-index:4; opacity:0; transition:opacity .3s ease; }
-                  .tips-container.show { opacity:1; }
-                  .tips-container h3 { margin:0 0 8px 0; color:#8b5cf6; }
-                  .tips-container p { margin:0; color:#ddd; }
-                </style>
+      .selection { width:100%; min-height: calc(100vh - 120px); display:flex; align-items:center; justify-content:center; position:relative; z-index: 4; }
+
+    .vignette, .glitch { position:fixed; inset:0; pointer-events:none; }
+    .glitch { background-image: url(resources/background.gif); background-position:center; background-size:auto; background-repeat:repeat; opacity:0.75; z-index:2; transition: opacity 600ms ease; }
+    .vignette { z-index: 3; opacity:1; transition: opacity 600ms ease; }
+      .vignette img { width:100%; height:100%; object-fit:cover; }
+
+      canvas { display:none; user-select:none}
+
+      #title { position:absolute; top:8vh; left:5vw; z-index:2; height:20vh; }
+      #animatronic { position:absolute; top:-5vh; right:7vw; height:120vh; z-index:1; }
+
+      .loader {
+        position:absolute; display:flex; flex-direction:column; align-items:center; left:50%; transform:translateX(-50%);
+        bottom: 10vh; z-index:3; color:#fff; font-family: 'Fredoka', monospace; text-align:center; width:85vw;
+      }
+      .loader h1 { margin:0; font-size:5vw; color:#ff6b6b; text-shadow: 0 0 8px rgba(255,68,68,0.6); }
+      .loader hr { margin:8px 0; border: none; height: 6px; width: 0%; background: linear-gradient(90deg,#8b0000,#ff4444); border-radius:6px; }
+      .loader h2 { margin: 6px 0 0; font-size:1.1rem; color:#ccc; }
+
+      .tips-container { position:absolute; top:4vh; left:50%; transform:translateX(-50%); max-width:80vw; background: rgba(0,0,0,0.6); border:2px solid #8b0000; padding:14px; border-radius:8px; color:#fff; z-index:4; opacity:0; transition:opacity .3s ease; }
+      .tips-container.show { opacity:1; }
+      .tips-container h3 { margin:0 0 8px 0; color:#8b5cf6; }
+      .tips-container p { margin:0; color:#ddd; }
+    </style>
             </head>
 
             <body>

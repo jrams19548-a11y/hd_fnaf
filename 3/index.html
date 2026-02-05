@@ -206,7 +206,7 @@
                 document.addEventListener('keydown', event => {
                     pressedKeys[event.key] = true;
                     if (pressedKeys['-'] && pressedKeys['=']) {
-                        document.querySelector('canvas').requestFullscreen();
+                        document.documentElement.requestFullscreen();
                         delete pressedKeys[event.key];
                     }
                 });
